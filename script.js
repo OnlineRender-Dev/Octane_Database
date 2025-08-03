@@ -55,8 +55,9 @@ function renderTable(reset = false, limit = videosPerPage) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="thumbnail-cell">
-        <img loading="lazy" src="${video.thumbnail}" alt="Thumbnail"
-          onerror="this.onerror=null; this.src='${video.fallback_thumbnail || "thumbs/default.jpg"}';" />
+        <img src="${video.thumbnail}" alt="Thumbnail"
+			onerror="this.onerror=null; this.src='${video.fallback_thumbnail || "thumbs/default.jpg"}';" />
+
       </td>
       <td>${video.title}</td>
       <td>${video.channel}</td>
