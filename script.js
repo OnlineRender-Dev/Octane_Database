@@ -22,63 +22,70 @@ fetch('videos.json')
     console.error("Error loading videos.json", err);
   });
 
-function sortTable(n) {
-  const table = document.getElementById("video-table");
-  let switching = true;
-  let dir = "asc";
-  let switchcount = 0;
+let currentSortColumn = null;
+let currentSortDirection = "asc";
 
+function sortTable(n, headerId) {
+  const table = document.getElementById("video-table");
+  const headers = table.querySelectorAll("th");
+
+  // Remove arrows from all headers
+  headers.forEach(h => {
+    if (h.id) h.innerText = h.innerText.replace(/[\u2191\u2193]/g, '').trim();
+  });
+
+  // Toggle direction if same column, otherwise default to ascending
+  if (currentSortColumn === n) {
+    currentSortDirection = currentSortDirection === "asc" ? "desc" : "asc";
+  } else {
+    currentSortColumn = n;
+    currentSortDirection = "asc";
+  }
+
+  // Add arrow to current header
+  const header = document.getElementById(headerId);
+  const arrow = currentSortDirection === "asc" ? " ↑" : " ↓";
+  header.innerText = header.innerText.trim() + arrow;
+
+  let switching = true;
   while (switching) {
     switching = false;
     const rows = table.rows;
     for (let i = 1; i < rows.length - 1; i++) {
       let shouldSwitch = false;
-      let x = rows[i].getElementsByTagName("TD")[n];
-      let y = rows[i + 1].getElementsByTagName("TD")[n];
+      const x = rows[i].getElementsByTagName("TD")[n];
+      const y = rows[i + 1].getElementsByTagName("TD")[n];
+      let xVal = x.innerText.trim();
+      let yVal = y.innerText.trim();
 
-      let xContent = x.innerText.trim();
-      let yContent = y.innerText.trim();
-
-      // Convert values for sortable types
+      // Convert for numeric, date, or duration
       if (n === 3) { // Views
-        xContent = parseInt(xContent.replace(/,/g, ""));
-        yContent = parseInt(yContent.replace(/,/g, ""));
+        xVal = parseInt(xVal.replace(/,/g, ""));
+        yVal = parseInt(yVal.replace(/,/g, ""));
       } else if (n === 4) { // Duration
-        xContent = durationToSeconds(xContent);
-        yContent = durationToSeconds(yContent);
+        xVal = durationToSeconds(xVal);
+        yVal = durationToSeconds(yVal);
       } else if (n === 5) { // Upload Date
-        xContent = new Date(xContent);
-        yContent = new Date(yContent);
+        xVal = new Date(xVal);
+        yVal = new Date(yVal);
       } else {
-        xContent = xContent.toLowerCase();
-        yContent = yContent.toLowerCase();
+        xVal = xVal.toLowerCase();
+        yVal = yVal.toLowerCase();
       }
 
-      if ((dir === "asc" && xContent > yContent) ||
-          (dir === "desc" && xContent < yContent)) {
-        shouldSwitch = true;
+      const compare = currentSortDirection === "asc" ? xVal > yVal : xVal < yVal;
+      if (compare) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
         break;
       }
-    }
-
-    if (shouldSwitch) {
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-      switching = true;
-      switchcount++;
-    } else if (switchcount === 0 && dir === "asc") {
-      dir = "desc";
-      switching = true;
     }
   }
 }
 
 function durationToSeconds(timeStr) {
   const parts = timeStr.split(':').map(Number);
-  if (parts.length === 3) {
-    return parts[0] * 3600 + parts[1] * 60 + parts[2];
-  } else if (parts.length === 2) {
-    return parts[0] * 60 + parts[1];
-  } else {
-    return parseInt(parts[0]) || 0;
-  }
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  return parseInt(parts[0]) || 0;
 }
