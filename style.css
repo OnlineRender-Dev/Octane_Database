@@ -3,37 +3,56 @@ body {
   padding: 20px;
   background-color: #f4f4f4;
 }
+
 h1 {
   text-align: center;
   margin-bottom: 20px;
 }
+
+#table-container {
+  overflow-x: auto;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
   background-color: #fff;
   box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
+
 th, td {
   padding: 10px 12px;
   border: 1px solid #ddd;
   text-align: left;
   vertical-align: middle;
 }
+
 th {
   background-color: #f0f0f0;
   cursor: pointer;
 }
+
 th:hover {
   background-color: #e0e0e0;
 }
+
 tr:nth-child(even) {
   background-color: #fafafa;
 }
+
 img {
   width: 120px;
   height: auto;
+  display: block;
 }
+
 a {
   color: #1a0dab;
   text-decoration: none;
+}
+
+td:nth-child(4),
+td:nth-child(5),
+td:nth-child(6) {
+  text-align: center;
 }
