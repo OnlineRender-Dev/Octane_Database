@@ -24,22 +24,43 @@ fetch('videos.json')
 
 function sortTable(n) {
   const table = document.getElementById("video-table");
-  let switching = true, dir = "asc", switchcount = 0;
+  let switching = true;
+  let dir = "asc";
+  let switchcount = 0;
 
   while (switching) {
     switching = false;
     const rows = table.rows;
     for (let i = 1; i < rows.length - 1; i++) {
       let shouldSwitch = false;
-      const x = rows[i].getElementsByTagName("TD")[n];
-      const y = rows[i + 1].getElementsByTagName("TD")[n];
-      const xVal = isNaN(x.innerText) ? x.innerText.toLowerCase() : parseInt(x.innerText.replace(/,/g, ''));
-      const yVal = isNaN(y.innerText) ? y.innerText.toLowerCase() : parseInt(y.innerText.replace(/,/g, ''));
-      if ((dir === "asc" && xVal > yVal) || (dir === "desc" && xVal < yVal)) {
+      let x = rows[i].getElementsByTagName("TD")[n];
+      let y = rows[i + 1].getElementsByTagName("TD")[n];
+
+      let xContent = x.innerText.trim();
+      let yContent = y.innerText.trim();
+
+      // Convert values for sortable types
+      if (n === 3) { // Views
+        xContent = parseInt(xContent.replace(/,/g, ""));
+        yContent = parseInt(yContent.replace(/,/g, ""));
+      } else if (n === 4) { // Duration
+        xContent = durationToSeconds(xContent);
+        yContent = durationToSeconds(yContent);
+      } else if (n === 5) { // Upload Date
+        xContent = new Date(xContent);
+        yContent = new Date(yContent);
+      } else {
+        xContent = xContent.toLowerCase();
+        yContent = yContent.toLowerCase();
+      }
+
+      if ((dir === "asc" && xContent > yContent) ||
+          (dir === "desc" && xContent < yContent)) {
         shouldSwitch = true;
         break;
       }
     }
+
     if (shouldSwitch) {
       rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
       switching = true;
@@ -48,5 +69,16 @@ function sortTable(n) {
       dir = "desc";
       switching = true;
     }
+  }
+}
+
+function durationToSeconds(timeStr) {
+  const parts = timeStr.split(':').map(Number);
+  if (parts.length === 3) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  } else if (parts.length === 2) {
+    return parts[0] * 60 + parts[1];
+  } else {
+    return parseInt(parts[0]) || 0;
   }
 }
