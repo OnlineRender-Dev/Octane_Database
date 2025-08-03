@@ -12,7 +12,7 @@ window.onload = () => {
   fetch("videos.json")
     .then(res => res.json())
     .then(videoData => {
-      allVideos = videoData;
+      allVideos = videoData.sort((a, b) => new Date(b.upload_date) - new Date(a.upload_date)); // sort newest first
 
       fuse = new Fuse(videoData, {
         keys: ['title', 'channel', 'upload_date'],
@@ -45,6 +45,8 @@ window.onload = () => {
 
 function renderTable(reset = false, limit = videosPerPage) {
   const tbody = document.getElementById('video-body');
+  const statusEl = document.getElementById("thumb-status");
+
   if (reset) {
     tbody.innerHTML = '';
     currentIndex = 0;
@@ -53,7 +55,7 @@ function renderTable(reset = false, limit = videosPerPage) {
   const nextBatch = activeList.slice(currentIndex, currentIndex + limit);
   let loadedCount = 0;
   const totalCount = nextBatch.length;
-  const statusEl = document.getElementById("thumb-status");
+
   if (statusEl) statusEl.textContent = `Loading thumbnails: 0 / ${totalCount}`;
 
   nextBatch.forEach(video => {
@@ -71,10 +73,11 @@ function renderTable(reset = false, limit = videosPerPage) {
       if (statusEl) {
         statusEl.textContent = `Loading thumbnails: ${loadedCount} / ${totalCount}`;
         if (loadedCount === totalCount) {
-          setTimeout(() => statusEl.textContent = "", 1000);
+          setTimeout(() => { statusEl.textContent = ""; }, 1000);
         }
       }
     };
+
     img.style.maxWidth = "100%";
     img.style.borderRadius = "4px";
 
@@ -87,6 +90,7 @@ function renderTable(reset = false, limit = videosPerPage) {
       <td>${video.upload_date}</td>
       <td><a href="${video.url}" target="_blank">Watch</a></td>
     `;
+
     tr.querySelector(".thumbnail-cell").appendChild(img);
     tbody.appendChild(tr);
   });
@@ -95,7 +99,9 @@ function renderTable(reset = false, limit = videosPerPage) {
   if (!isSearching) lastShownCount = currentIndex;
 
   const loadMoreBtn = document.getElementById("loadMoreBtn");
-  loadMoreBtn.style.display = currentIndex >= activeList.length ? "none" : "inline-block";
+  if (loadMoreBtn) {
+    loadMoreBtn.style.display = currentIndex >= activeList.length ? "none" : "inline-block";
+  }
 
   updateVideoCount();
 }
@@ -191,28 +197,32 @@ function durationToSeconds(timeStr) {
 function updateVideoCount() {
   const total = allVideos.length;
   const shown = Math.min(currentIndex, activeList.length);
-  document.getElementById("video-count").innerHTML = `
-    Total Tutorials in Database: ${total}<br>
-    Showing ${shown} of ${activeList.length}
-  `;
+  const el = document.getElementById("video-count");
+  if (el) {
+    el.innerHTML = `Total Tutorials in Database: ${total}<br>Showing ${shown} of ${activeList.length}`;
+  }
 }
 
 function setupScrollToTop() {
   const btn = document.createElement("button");
   btn.textContent = "↑";
   btn.title = "Back to Top";
-  btn.style.position = "fixed";
-  btn.style.bottom = "20px";
-  btn.style.right = "20px";
-  btn.style.zIndex = "1000";
-  btn.style.padding = "8px 12px";
-  btn.style.backgroundColor = "#333";
-  btn.style.color = "#fff";
-  btn.style.border = "none";
-  btn.style.borderRadius = "4px";
-  btn.style.fontSize = "18px";
-  btn.style.cursor = "pointer";
-  btn.style.display = "none";
+  btn.id = "scrollTopBtn";
+
+  Object.assign(btn.style, {
+    position: "fixed",
+    bottom: "20px",
+    right: "20px",
+    zIndex: "1000",
+    padding: "8px 12px",
+    backgroundColor: "#333",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    fontSize: "18px",
+    cursor: "pointer",
+    display: "none"
+  });
 
   document.body.appendChild(btn);
 
