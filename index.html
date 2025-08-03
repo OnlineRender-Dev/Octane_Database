@@ -11,16 +11,17 @@
   <div id="table-container">
     <table id="video-table">
       <thead>
-        <tr>
-          <th>Thumbnail</th>
-          <th onclick="sortTable(1)">Title</th>
-          <th onclick="sortTable(2)">Channel</th>
-          <th onclick="sortTable(3)">Views</th>
-          <th onclick="sortTable(4)">Duration</th>
-          <th onclick="sortTable(5)">Upload Date</th>
-          <th>Link</th>
-        </tr>
-      </thead>
+  <tr>
+    <th>Thumbnail</th>
+    <th id="th-title" onclick="sortTable(1, 'th-title')">Title</th>
+    <th id="th-channel" onclick="sortTable(2, 'th-channel')">Channel</th>
+    <th id="th-views" onclick="sortTable(3, 'th-views')">Views</th>
+    <th id="th-duration" onclick="sortTable(4, 'th-duration')">Duration</th>
+    <th id="th-date" onclick="sortTable(5, 'th-date')">Upload Date</th>
+    <th>Link</th>
+  </tr>
+</thead>
+
       <tbody id="video-body">
         <!-- Video rows will be inserted here -->
       </tbody>
@@ -29,3 +30,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+
