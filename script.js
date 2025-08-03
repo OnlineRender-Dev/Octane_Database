@@ -29,58 +29,54 @@ function sortTable(n, headerId) {
   const table = document.getElementById("video-table");
   const headers = table.querySelectorAll("th");
 
-  // Remove arrows from all headers
+  // Remove all arrows
   headers.forEach(h => {
-    if (h.id) h.innerText = h.innerText.replace(/[\u2191\u2193]/g, '').trim();
+    if (h.id) {
+      h.innerText = h.innerText.replace(/[\u2191\u2193]/g, '').trim();
+    }
   });
 
-  // Toggle direction if same column, otherwise default to ascending
+  // Decide sort direction
   if (currentSortColumn === n) {
     currentSortDirection = currentSortDirection === "asc" ? "desc" : "asc";
   } else {
     currentSortColumn = n;
-    currentSortDirection = "asc";
+    currentSortDirection = "asc"; // Always start ascending for a new column
   }
 
-  // Add arrow to current header
+  // Apply arrow immediately
   const header = document.getElementById(headerId);
   const arrow = currentSortDirection === "asc" ? " ↑" : " ↓";
   header.innerText = header.innerText.trim() + arrow;
 
-  let switching = true;
-  while (switching) {
-    switching = false;
-    const rows = table.rows;
-    for (let i = 1; i < rows.length - 1; i++) {
-      let shouldSwitch = false;
-      const x = rows[i].getElementsByTagName("TD")[n];
-      const y = rows[i + 1].getElementsByTagName("TD")[n];
-      let xVal = x.innerText.trim();
-      let yVal = y.innerText.trim();
+  // Sort rows
+  const rows = Array.from(table.rows).slice(1); // Skip header row
+  rows.sort((a, b) => {
+    let x = a.cells[n].innerText.trim();
+    let y = b.cells[n].innerText.trim();
 
-      // Convert for numeric, date, or duration
-      if (n === 3) { // Views
-        xVal = parseInt(xVal.replace(/,/g, ""));
-        yVal = parseInt(yVal.replace(/,/g, ""));
-      } else if (n === 4) { // Duration
-        xVal = durationToSeconds(xVal);
-        yVal = durationToSeconds(yVal);
-      } else if (n === 5) { // Upload Date
-        xVal = new Date(xVal);
-        yVal = new Date(yVal);
-      } else {
-        xVal = xVal.toLowerCase();
-        yVal = yVal.toLowerCase();
-      }
-
-      const compare = currentSortDirection === "asc" ? xVal > yVal : xVal < yVal;
-      if (compare) {
-        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-        switching = true;
-        break;
-      }
+    if (n === 3) { // Views
+      x = parseInt(x.replace(/,/g, ''));
+      y = parseInt(y.replace(/,/g, ''));
+    } else if (n === 4) { // Duration
+      x = durationToSeconds(x);
+      y = durationToSeconds(y);
+    } else if (n === 5) { // Upload date
+      x = new Date(x);
+      y = new Date(y);
+    } else {
+      x = x.toLowerCase();
+      y = y.toLowerCase();
     }
-  }
+
+    if (x < y) return currentSortDirection === "asc" ? -1 : 1;
+    if (x > y) return currentSortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // Reattach sorted rows
+  const tbody = table.tBodies[0];
+  rows.forEach(row => tbody.appendChild(row));
 }
 
 function durationToSeconds(timeStr) {
