@@ -5,7 +5,7 @@ fetch('videos.json')
     data.forEach(video => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><img src="${video.thumbnail}" alt="Thumbnail"></td>
+        <td><img src="${video.thumbnail}" alt="Thumbnail" /></td>
         <td>${video.title}</td>
         <td>${video.channel}</td>
         <td>${video.views.toLocaleString()}</td>
@@ -31,10 +31,10 @@ function sortTable(n) {
     const rows = table.rows;
     for (let i = 1; i < rows.length - 1; i++) {
       let shouldSwitch = false;
-      let x = rows[i].getElementsByTagName("TD")[n];
-      let y = rows[i + 1].getElementsByTagName("TD")[n];
-      let xVal = isNaN(x.innerText) ? x.innerText.toLowerCase() : parseInt(x.innerText.replace(/,/g, ''));
-      let yVal = isNaN(y.innerText) ? y.innerText.toLowerCase() : parseInt(y.innerText.replace(/,/g, ''));
+      const x = rows[i].getElementsByTagName("TD")[n];
+      const y = rows[i + 1].getElementsByTagName("TD")[n];
+      const xVal = isNaN(x.innerText) ? x.innerText.toLowerCase() : parseInt(x.innerText.replace(/,/g, ''));
+      const yVal = isNaN(y.innerText) ? y.innerText.toLowerCase() : parseInt(y.innerText.replace(/,/g, ''));
       if ((dir === "asc" && xVal > yVal) || (dir === "desc" && xVal < yVal)) {
         shouldSwitch = true;
         break;
