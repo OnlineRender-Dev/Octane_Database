@@ -1,11 +1,11 @@
-fetch('data/videos.json')
-
+fetch('videos.json')
   .then(res => res.json())
   .then(data => {
     const tbody = document.getElementById('video-body');
     data.forEach(video => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
+        <td><img src="${video.thumbnail}" alt="Thumbnail"></td>
         <td>${video.title}</td>
         <td>${video.channel}</td>
         <td>${video.views.toLocaleString()}</td>
@@ -18,7 +18,7 @@ fetch('data/videos.json')
   })
   .catch(err => {
     document.getElementById('video-body').innerHTML =
-      `<tr><td colspan="6">Failed to load videos.</td></tr>`;
+      `<tr><td colspan="7">Failed to load videos.</td></tr>`;
     console.error("Error loading videos.json", err);
   });
 
@@ -28,7 +28,7 @@ function sortTable(n) {
 
   while (switching) {
     switching = false;
-    let rows = table.rows;
+    const rows = table.rows;
     for (let i = 1; i < rows.length - 1; i++) {
       let shouldSwitch = false;
       let x = rows[i].getElementsByTagName("TD")[n];
@@ -44,11 +44,9 @@ function sortTable(n) {
       rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
       switching = true;
       switchcount++;
-    } else {
-      if (switchcount === 0 && dir === "asc") {
-        dir = "desc";
-        switching = true;
-      }
+    } else if (switchcount === 0 && dir === "asc") {
+      dir = "desc";
+      switching = true;
     }
   }
 }
