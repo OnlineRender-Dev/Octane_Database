@@ -1,0 +1,47 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #e5e5e5;
+  margin: 0;
+  padding: 20px;
+}
+
+#video-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.video-card {
+  display: flex;
+  background: #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  overflow: hidden;
+  border: 1px solid #ccc;
+}
+
+.video-card img {
+  width: 200px;
+  object-fit: cover;
+  background: #000;
+}
+
+.video-info {
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.video-info h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.video-info p {
+  margin: 3px 0;
+  font-size: 14px;
+  color: #333;
+}
