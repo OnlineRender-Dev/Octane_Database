@@ -52,7 +52,10 @@ function renderTable(reset = false, limit = videosPerPage) {
   nextBatch.forEach(video => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td class="thumbnail-cell"><img loading="lazy" src="${video.thumbnail}" alt="Thumbnail" /></td>
+      <td class="thumbnail-cell">
+        <img loading="lazy" src="${video.thumbnail}" alt="Thumbnail"
+             onerror="this.src='thumbs/default.jpg';" />
+      </td>
       <td>${video.title}</td>
       <td>${video.channel}</td>
       <td>${video.views.toLocaleString()}</td>
@@ -201,11 +204,7 @@ function setupScrollToTop() {
   if (!scrollBtn) return;
 
   window.addEventListener("scroll", () => {
-    if (window.scrollY > 200) {
-      scrollBtn.style.display = "block";
-    } else {
-      scrollBtn.style.display = "none";
-    }
+    scrollBtn.style.display = window.scrollY > 200 ? "block" : "none";
   });
 
   scrollBtn.addEventListener("click", () => {
