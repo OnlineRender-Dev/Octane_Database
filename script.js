@@ -51,14 +51,35 @@ function renderTable(reset = false, limit = videosPerPage) {
   }
 
   const nextBatch = activeList.slice(currentIndex, currentIndex + limit);
+  let loadedCount = 0;
+  const totalCount = nextBatch.length;
+  const statusEl = document.getElementById("thumb-status");
+  if (statusEl) statusEl.textContent = `Loading thumbnails: 0 / ${totalCount}`;
+
   nextBatch.forEach(video => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="thumbnail-cell">
-        <img src="${video.thumbnail}" alt="Thumbnail"
-			onerror="this.onerror=null; this.src='${video.fallback_thumbnail || "thumbs/default.jpg"}';" />
 
-      </td>
+    const img = new Image();
+    img.src = video.thumbnail;
+    img.alt = "Thumbnail";
+    img.onerror = () => {
+      img.onerror = null;
+      img.src = video.fallback_thumbnail || "thumbs/default.jpg";
+    };
+    img.onload = img.onerror = () => {
+      loadedCount++;
+      if (statusEl) {
+        statusEl.textContent = `Loading thumbnails: ${loadedCount} / ${totalCount}`;
+        if (loadedCount === totalCount) {
+          setTimeout(() => statusEl.textContent = "", 1000);
+        }
+      }
+    };
+    img.style.maxWidth = "100%";
+    img.style.borderRadius = "4px";
+
+    tr.innerHTML = `
+      <td class="thumbnail-cell"></td>
       <td>${video.title}</td>
       <td>${video.channel}</td>
       <td>${video.views.toLocaleString()}</td>
@@ -66,6 +87,7 @@ function renderTable(reset = false, limit = videosPerPage) {
       <td>${video.upload_date}</td>
       <td><a href="${video.url}" target="_blank">Watch</a></td>
     `;
+    tr.querySelector(".thumbnail-cell").appendChild(img);
     tbody.appendChild(tr);
   });
 
