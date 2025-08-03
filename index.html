@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>YouTube Video Archive</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 14px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      table-layout: fixed;
+    }
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      vertical-align: middle;
+      word-wrap: break-word;
+    }
+    th {
+      background-color: #f0f0f0;
+      cursor: pointer;
+      user-select: none;
+      text-align: left;
+    }
+    th:hover {
+      background-color: #e0e0e0;
+    }
+    tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+    td.thumbnail-cell img {
+      max-width: 90px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      border-radius: 4px;
+    }
+    td:nth-child(4),
+    td:nth-child(5),
+    td:nth-child(6) {
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    a {
+      color: #1a0dab;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .hide-thumbnails td.thumbnail-cell,
+    .hide-thumbnails th.thumbnail-header {
+      display: none;
+    }
+    #controls {
+      margin-bottom: 12px;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #last-updated {
+      color: #666;
+    }
+  </style>
+</head>
+<body class="hide-thumbnails">
+
+<div id="search-container" style="margin-bottom: 15px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+  <input type="text" id="searchInput" placeholder="Search videos..." style="padding: 8px; font-size: 16px; width: 40%; min-width: 240px;">
+  
+  <select id="minDuration" style="padding: 6px; font-size: 14px; width: 160px;">
+    <option value="0">Min Duration</option>
+    <option value="60">1 min</option>
+    <option value="300">5 min</option>
+    <option value="600">10 min</option>
+    <option value="1200">20 min</option>
+    <option value="1800">30 min</option>
+  </select>
+
+  <select id="minViews" style="padding: 6px; font-size: 14px; width: 160px;">
+    <option value="0">Min Views</option>
+    <option value="1000">1,000+</option>
+    <option value="10000">10,000+</option>
+    <option value="50000">50,000+</option>
+    <option value="100000">100,000+</option>
+    <option value="500000">500,000+</option>
+    <option value="1000000">1,000,000+</option>
+  </select>
+</div>
+
+
+
+	<div id="controls">
+  <div style="display: flex; align-items: center; gap: 20px;">
+    <label>
+      <input type="checkbox" id="toggleThumbs">
+      Show Thumbnails
+    </label>
+
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div id="video-count" style="color: #555; font-size: 14px;">
+        Total Tutorials in Database: ...<br>
+        Showing ... of ...
+      </div>
+      <button id="loadAllBtn" style="font-size: 13px; padding: 4px 10px; cursor: pointer;">Load All</button>
+    </div>
+  </div>
+
+  <span id="last-updated">Last Updated: ...</span>
+</div>
+
+  <table id="video-table">
+    <thead>
+      <tr>
+        <th class="thumbnail-header">Thumbnail</th>
+        <th id="th-title" onclick="sortTable(1, 'th-title')">Title</th>
+        <th id="th-channel" onclick="sortTable(2, 'th-channel')">Channel</th>
+        <th id="th-views" onclick="sortTable(3, 'th-views')">Views</th>
+        <th id="th-duration" onclick="sortTable(4, 'th-duration')">Duration</th>
+        <th id="th-date" onclick="sortTable(5, 'th-date')">Upload Date</th>
+        <th>Link</th>
+      </tr>
+    </thead>
+    <tbody id="video-body"></tbody>
+  </table>
+  
+  <div id="load-more-container" style="text-align:center; margin-top: 20px;">
+    <button id="loadMoreBtn" style="padding: 10px 20px; font-size: 16px;">Load More</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+  <script src="script.js"></script>
+  <button id="scrollTopBtn" title="Back to Top">↑</button>
+
+</body>
+</html>
