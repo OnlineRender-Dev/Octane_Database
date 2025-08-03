@@ -8,7 +8,7 @@ let lastShownCount = videosPerPage;
 let activeList = [];
 let isSearching = false;
 
-document.addEventListener("DOMContentLoaded", () => {
+window.onload = () => {
   fetch("videos.json")
     .then(res => res.json())
     .then(videoData => {
@@ -25,7 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
       setupSearchAndFilters();
       setupToggle();
       setupLoadMore();
-      setupScrollToTop();
+      setupLoadAll();
+      updateVideoCount();
     });
 
   fetch("https://api.github.com/repos/OnlineRender-Dev/Octane_Database/commits?path=videos.json")
@@ -38,11 +39,12 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch(() => {
       document.getElementById("last-updated").textContent = `Last Updated: unknown`;
     });
-});
+
+  setupScrollToTop();
+};
 
 function renderTable(reset = false, limit = videosPerPage) {
   const tbody = document.getElementById('video-body');
-
   if (reset) {
     tbody.innerHTML = '';
     currentIndex = 0;
@@ -54,7 +56,7 @@ function renderTable(reset = false, limit = videosPerPage) {
     tr.innerHTML = `
       <td class="thumbnail-cell">
         <img loading="lazy" src="${video.thumbnail}" alt="Thumbnail"
-             onerror="this.src='thumbs/default.jpg';" />
+          onerror="this.onerror=null; this.src='${video.fallback_thumbnail || "thumbs/default.jpg"}';" />
       </td>
       <td>${video.title}</td>
       <td>${video.channel}</td>
@@ -67,10 +69,7 @@ function renderTable(reset = false, limit = videosPerPage) {
   });
 
   currentIndex += limit;
-
-  if (!isSearching) {
-    lastShownCount = currentIndex;
-  }
+  if (!isSearching) lastShownCount = currentIndex;
 
   const loadMoreBtn = document.getElementById("loadMoreBtn");
   loadMoreBtn.style.display = currentIndex >= activeList.length ? "none" : "inline-block";
@@ -80,39 +79,28 @@ function renderTable(reset = false, limit = videosPerPage) {
 
 function setupSearchAndFilters() {
   const searchInput = document.getElementById("searchInput");
-  const minDurationInput = document.getElementById("minDuration");
-  const minViewsInput = document.getElementById("minViews");
+  const minViews = document.getElementById("minViews");
+  const minDuration = document.getElementById("minDuration");
 
-  function applyFilters() {
-    const query = searchInput.value.trim().toLowerCase();
-    const minViews = parseInt(minViewsInput.value) || 0;
-    const minDuration = parseInt(minDurationInput.value) || 0;
+  function filterAndRender() {
+    const query = searchInput.value.trim();
+    const minViewsVal = parseInt(minViews.value) || 0;
+    const minDurationVal = parseInt(minDuration.value) || 0;
 
-    let filtered = allVideos.filter(video => {
-      const viewsOK = (video.views || 0) >= minViews;
-      const durationOK = durationToSeconds(video.duration) >= minDuration;
-      return viewsOK && durationOK;
-    });
+    const listToFilter = query === "" ? allVideos : fuse.search(query).map(r => r.item);
+    isSearching = query !== "";
 
-    if (query !== "") {
-      const searchResults = fuse.search(query).map(result => result.item);
-      filtered = filtered.filter(v => searchResults.includes(v));
-      isSearching = true;
-    } else {
-      isSearching = false;
-    }
+    activeList = listToFilter.filter(video =>
+      video.views >= minViewsVal &&
+      durationToSeconds(video.duration) >= minDurationVal
+    );
 
-    activeList = filtered;
     renderTable(true, videosPerPage);
   }
 
-  [searchInput, minDurationInput, minViewsInput].forEach(input => {
-    input.addEventListener("change", applyFilters);
-    input.addEventListener("input", applyFilters);
-    input.addEventListener("keydown", e => {
-      if (e.key === "Enter") applyFilters();
-    });
-  });
+  searchInput.addEventListener("input", filterAndRender);
+  minViews.addEventListener("change", filterAndRender);
+  minDuration.addEventListener("change", filterAndRender);
 }
 
 function setupToggle() {
@@ -125,9 +113,11 @@ function setupLoadMore() {
   document.getElementById("loadMoreBtn").addEventListener("click", () => {
     renderTable(false, videosPerPage);
   });
+}
 
+function setupLoadAll() {
   document.getElementById("loadAllBtn").addEventListener("click", () => {
-    renderTable(false, activeList.length - currentIndex);
+    renderTable(true, activeList.length);
   });
 }
 
@@ -136,9 +126,7 @@ function sortTable(n, headerId) {
   const headers = table.querySelectorAll("th");
 
   headers.forEach(h => {
-    if (h.id) {
-      h.innerText = h.innerText.replace(/[\u2191\u2193]/g, '').trim();
-    }
+    if (h.id) h.innerText = h.innerText.replace(/[\u2191\u2193]/g, '').trim();
   });
 
   if (currentSortColumn === n) {
@@ -149,32 +137,22 @@ function sortTable(n, headerId) {
   }
 
   const header = document.getElementById(headerId);
-  const arrow = currentSortDirection === "asc" ? " ↑" : " ↓";
-  header.innerText = header.innerText.trim() + arrow;
+  header.innerText += currentSortDirection === "asc" ? " ↑" : " ↓";
 
   activeList.sort((a, b) => {
     let x, y;
-
     if (n === 3) {
-      x = a.views || 0;
-      y = b.views || 0;
+      x = a.views || 0; y = b.views || 0;
     } else if (n === 4) {
-      x = durationToSeconds(a.duration);
-      y = durationToSeconds(b.duration);
+      x = durationToSeconds(a.duration); y = durationToSeconds(b.duration);
     } else if (n === 5) {
-      x = new Date(a.upload_date);
-      y = new Date(b.upload_date);
+      x = new Date(a.upload_date); y = new Date(b.upload_date);
     } else if (n === 1) {
-      x = a.title.toLowerCase();
-      y = b.title.toLowerCase();
+      x = a.title.toLowerCase(); y = b.title.toLowerCase();
     } else if (n === 2) {
-      x = a.channel.toLowerCase();
-      y = b.channel.toLowerCase();
+      x = a.channel.toLowerCase(); y = b.channel.toLowerCase();
     }
-
-    if (x < y) return currentSortDirection === "asc" ? -1 : 1;
-    if (x > y) return currentSortDirection === "asc" ? 1 : -1;
-    return 0;
+    return (x < y ? -1 : x > y ? 1 : 0) * (currentSortDirection === "asc" ? 1 : -1);
   });
 
   renderTable(true, isSearching ? videosPerPage : lastShownCount);
@@ -188,26 +166,38 @@ function durationToSeconds(timeStr) {
 }
 
 function updateVideoCount() {
-  const shown = Math.min(currentIndex, activeList.length);
   const total = allVideos.length;
-  const counter = document.getElementById("video-count");
-  if (counter) {
-    counter.innerHTML = `
-      Total Tutorials in Database: <strong>${total}</strong><br>
-      Showing <strong>${shown}</strong> of <strong>${activeList.length}</strong>
-    `;
-  }
+  const shown = Math.min(currentIndex, activeList.length);
+  document.getElementById("video-count").innerHTML = `
+    Total Tutorials in Database: ${total}<br>
+    Showing ${shown} of ${activeList.length}
+  `;
 }
 
 function setupScrollToTop() {
-  const scrollBtn = document.getElementById("scrollTopBtn");
-  if (!scrollBtn) return;
+  const btn = document.createElement("button");
+  btn.textContent = "↑";
+  btn.title = "Back to Top";
+  btn.style.position = "fixed";
+  btn.style.bottom = "20px";
+  btn.style.right = "20px";
+  btn.style.zIndex = "1000";
+  btn.style.padding = "8px 12px";
+  btn.style.backgroundColor = "#333";
+  btn.style.color = "#fff";
+  btn.style.border = "none";
+  btn.style.borderRadius = "4px";
+  btn.style.fontSize = "18px";
+  btn.style.cursor = "pointer";
+  btn.style.display = "none";
 
-  window.addEventListener("scroll", () => {
-    scrollBtn.style.display = window.scrollY > 200 ? "block" : "none";
+  document.body.appendChild(btn);
+
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
-  scrollBtn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  window.addEventListener("scroll", () => {
+    btn.style.display = window.scrollY > 200 ? "block" : "none";
   });
 }
