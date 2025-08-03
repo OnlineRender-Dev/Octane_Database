@@ -18,6 +18,7 @@ table {
   width: 100%;
   background-color: #fff;
   box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  table-layout: fixed; /* Force tight columns */
 }
 
 th, td {
@@ -25,6 +26,7 @@ th, td {
   border: 1px solid #ddd;
   text-align: left;
   vertical-align: middle;
+  word-wrap: break-word;
 }
 
 th {
@@ -37,23 +39,42 @@ th:hover {
   background-color: #e0e0e0;
 }
 
+/* Even rows alternate color */
 tr:nth-child(even) {
   background-color: #fafafa;
 }
 
-img {
+/* Thumbnail column tighter layout */
+td:first-child {
+  padding: 2px 4px;
   width: 120px;
-  height: auto;
-  display: block;
+  text-align: center;
+  vertical-align: middle;
 }
 
+/* Image style */
+td img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+/* Center numeric/date columns */
+td:nth-child(4),  /* Views */
+td:nth-child(5),  /* Duration */
+td:nth-child(6)   /* Upload Date */ {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Link style */
 a {
   color: #1a0dab;
   text-decoration: none;
 }
 
-td:nth-child(4), /* Views */
-td:nth-child(5), /* Duration */
-td:nth-child(6)  /* Upload Date */ {
-  text-align: center;
+a:hover {
+  text-decoration: underline;
 }
