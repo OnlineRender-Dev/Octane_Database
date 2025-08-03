@@ -30,6 +30,7 @@ th, td {
 th {
   background-color: #f0f0f0;
   cursor: pointer;
+  user-select: none;
 }
 
 th:hover {
@@ -51,8 +52,8 @@ a {
   text-decoration: none;
 }
 
-td:nth-child(4),
-td:nth-child(5),
-td:nth-child(6) {
+td:nth-child(4), /* Views */
+td:nth-child(5), /* Duration */
+td:nth-child(6)  /* Upload Date */ {
   text-align: center;
 }
