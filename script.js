@@ -1,4 +1,5 @@
-fetch('videos.json')
+fetch('data/videos.json')
+
   .then(res => res.json())
   .then(data => {
     const tbody = document.getElementById('video-body');
