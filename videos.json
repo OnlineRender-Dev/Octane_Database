@@ -1,11 +1,20 @@
 [
   {
-    "title": "Blender Animation Basics",
-    "channel": "CG Fast Track",
-    "views": 150432,
-    "duration": "10:24",
-    "upload_date": "2025-07-21",
+    "title": "Learn Blender Fast",
+    "channel": "Blender Bros",
+    "views": 123456,
+    "duration": "14:21",
+    "upload_date": "2025-07-20",
     "url": "https://www.youtube.com/watch?v=abc123",
-    "thumbnail": "https://i.ytimg.com/vi/abc123/hqdefault.jpg"
+    "thumbnail": "thumbs/abc123.jpg"
+  },
+  {
+    "title": "Octane for Blender Quickstart",
+    "channel": "CG Boost",
+    "views": 87421,
+    "duration": "09:35",
+    "upload_date": "2025-06-18",
+    "url": "https://www.youtube.com/watch?v=xyz789",
+    "thumbnail": "thumbs/xyz789.jpg"
   }
 ]
