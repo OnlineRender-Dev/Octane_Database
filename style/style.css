@@ -311,7 +311,7 @@ body.dark .last-updated-top {
 
 .logo-text {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--text);
 }
 
@@ -391,3 +391,15 @@ body.dark .sponsor-right {
   color: var(--text);
   opacity: 0.85;
 }
+
+#videoType {
+  padding: 10px 12px;
+  font-size: 14px;
+  width: 200px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 10px;
+  outline: none;
+}
+#videoType:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.15); }

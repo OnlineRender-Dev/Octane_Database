@@ -118,6 +118,17 @@ function updateLoadButtons() {
   }
 }
 
+/* ===== NEW: populate Video Type options from JSON ===== */
+function populateVideoTypeOptions(videos) {
+  const sel = document.getElementById("videoType");
+  if (!sel) return;
+  const types = Array.from(new Set(
+    videos.map(v => (v.video_type || "").trim()).filter(Boolean)
+  )).sort((a,b) => a.localeCompare(b));
+  sel.innerHTML = `<option value="">All Tutorials</option>` +
+    types.map(t => `<option value="${t}">${t}</option>`).join("");
+}
+
 /* ========== App init ========== */
 window.onload = () => {
   // Initialize UI preferences
@@ -134,6 +145,9 @@ window.onload = () => {
       allVideos = (videoData || []).sort(
         (a, b) => new Date(b.upload_date) - new Date(a.upload_date)
       );
+
+      // NEW: build the Video Type select dynamically
+      populateVideoTypeOptions(allVideos);
 
       fuse = new Fuse(allVideos, {
         keys: ["title", "channel", "upload_date"],
@@ -258,20 +272,23 @@ function setupSearchAndFilters() {
   const searchInput = document.getElementById("searchInput");
   const minViews = document.getElementById("minViews");
   const minDuration = document.getElementById("minDuration");
+  const typeSelect = document.getElementById("videoType"); // NEW
 
   function filterAndRender() {
     const query = (searchInput.value || "").trim();
     const minViewsVal = parseInt(minViews.value, 10) || 0;
     const minDurationVal = parseInt(minDuration.value, 10) || 0;
+    const selectedType = (typeSelect?.value || "").trim(); // NEW
 
     // Any filter or query counts as searching
-    isSearching = query !== "" || minViewsVal > 0 || minDurationVal > 0;
+    isSearching = query !== "" || minViewsVal > 0 || minDurationVal > 0 || selectedType !== ""; // NEW
 
     const listToFilter = query === "" ? allVideos : fuse.search(query).map(r => r.item);
 
     activeList = listToFilter.filter(video =>
       (video.views || 0) >= minViewsVal &&
-      durationToSeconds(video.duration) >= minDurationVal
+      durationToSeconds(video.duration) >= minDurationVal &&
+      (selectedType === "" || (video.video_type || "").trim() === selectedType) // NEW
     );
 
     // If showAllMode or searching, show all; else paginate
@@ -284,6 +301,7 @@ function setupSearchAndFilters() {
   searchInput.addEventListener("input", filterAndRender);
   minViews.addEventListener("change", filterAndRender);
   minDuration.addEventListener("change", filterAndRender);
+  typeSelect?.addEventListener("change", filterAndRender); // NEW
 }
 
 function setupLoadMore() {
@@ -324,7 +342,7 @@ function sortTable(n, headerId) {
   }
 
   const header = document.getElementById(headerId);
-  if (header) header.innerText += currentSortDirection === "asc" ? " ↑" : " ↓";
+  if (header) header.innerText += currentSortDirection === "asc" ? "↑" : "↓";
 
   activeList.sort((a, b) => {
     let x, y;
