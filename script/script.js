@@ -9,6 +9,9 @@ let lastShownCount = videosPerPage;
 let activeList = [];
 let isSearching = false;
 
+// One-click "Load All" latch for the session
+let showAllMode = false;
+
 /* ========== Theme handling (default: dark) ========== */
 function initTheme() {
   let saved = localStorage.getItem("theme");
@@ -80,9 +83,44 @@ function setupToggle() {
   });
 }
 
+/* ===== Helpers ===== */
+function durationToSeconds(timeStr) {
+  const parts = String(timeStr || "").split(":").map(Number);
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  return parseInt(parts[0], 10) || 0;
+}
+function escapeHTML(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+function escapeAttr(str) {
+  return escapeHTML(str).replaceAll(" ", "%20");
+}
+
+function updateLoadButtons() {
+  const loadMoreBtn = document.getElementById("loadMoreBtn");
+  const loadAllBtn  = document.getElementById("loadAllBtn");
+  if (showAllMode) {
+    if (loadMoreBtn) loadMoreBtn.style.display = "none";
+    if (loadAllBtn)  loadAllBtn.style.display  = "none";
+  } else {
+    if (loadMoreBtn) {
+      loadMoreBtn.style.display = currentIndex >= activeList.length ? "none" : "inline-block";
+    }
+    if (loadAllBtn) {
+      loadAllBtn.style.display = "inline-block";
+    }
+  }
+}
+
 /* ========== App init ========== */
 window.onload = () => {
-  // Initialize UI preferences first
+  // Initialize UI preferences
   initTheme();
   initLayoutToggle();
 
@@ -106,12 +144,13 @@ window.onload = () => {
       activeList = allVideos;
       renderTable(true, lastShownCount);
       setupSearchAndFilters();
-      setupToggle();          // thumbnails
+      setupToggle();          // thumbnails toggle
       setupLoadMore();
       setupLoadAll();
-      setupThemeToggle();     // dark mode
-      setupLayoutToggle();    // width
+      setupThemeToggle();     // dark mode toggle
+      setupLayoutToggle();    // layout toggle
       updateVideoCount();
+      updateLoadButtons();
     })
     .catch(err => {
       console.error("Failed to load Data/videos.json:", err);
@@ -126,6 +165,7 @@ window.onload = () => {
       setupToggle();
       setupThemeToggle();
       setupLayoutToggle();
+      updateLoadButtons();
     });
 
   // GitHub "Last Updated"
@@ -158,11 +198,17 @@ function renderTable(reset = false, limit = videosPerPage) {
     currentIndex = 0;
   }
 
-  const nextBatch = activeList.slice(currentIndex, currentIndex + limit);
+  // Force "show all" when latched OR when actively searching/filtering
+  const effectiveLimit = (showAllMode || isSearching) ? activeList.length : limit;
+
+  const nextBatch = activeList.slice(currentIndex, currentIndex + effectiveLimit);
   let loadedCount = 0;
   const totalCount = nextBatch.length;
 
-  if (statusEl) statusEl.textContent = `Loading thumbnails: 0 / ${totalCount}`;
+  // Suppress the "Loading thumbnails" counter in showAllMode
+  if (!showAllMode && statusEl) {
+    statusEl.textContent = `Loading thumbnails: 0 / ${totalCount}`;
+  }
 
   nextBatch.forEach(video => {
     const tr = document.createElement("tr");
@@ -176,7 +222,7 @@ function renderTable(reset = false, limit = videosPerPage) {
     };
     img.onload = img.onerror = () => {
       loadedCount++;
-      if (statusEl) {
+      if (!showAllMode && statusEl) {
         statusEl.textContent = `Loading thumbnails: ${loadedCount} / ${totalCount}`;
         if (loadedCount === totalCount) {
           setTimeout(() => { statusEl.textContent = ""; }, 800);
@@ -201,15 +247,11 @@ function renderTable(reset = false, limit = videosPerPage) {
     tbody.appendChild(tr);
   });
 
-  currentIndex += limit;
-  if (!isSearching) lastShownCount = currentIndex;
-
-  const loadMoreBtn = document.getElementById("loadMoreBtn");
-  if (loadMoreBtn) {
-    loadMoreBtn.style.display = currentIndex >= activeList.length ? "none" : "inline-block";
-  }
+  currentIndex += effectiveLimit;
+  if (!isSearching && !showAllMode) lastShownCount = currentIndex;
 
   updateVideoCount();
+  updateLoadButtons();
 }
 
 function setupSearchAndFilters() {
@@ -222,15 +264,21 @@ function setupSearchAndFilters() {
     const minViewsVal = parseInt(minViews.value, 10) || 0;
     const minDurationVal = parseInt(minDuration.value, 10) || 0;
 
+    // Any filter or query counts as searching
+    isSearching = query !== "" || minViewsVal > 0 || minDurationVal > 0;
+
     const listToFilter = query === "" ? allVideos : fuse.search(query).map(r => r.item);
-    isSearching = query !== "";
 
     activeList = listToFilter.filter(video =>
       (video.views || 0) >= minViewsVal &&
       durationToSeconds(video.duration) >= minDurationVal
     );
 
-    renderTable(true, videosPerPage);
+    // If showAllMode or searching, show all; else paginate
+    const limit = (showAllMode || isSearching) ? activeList.length : videosPerPage;
+
+    renderTable(true, limit);
+    lastShownCount = limit;
   }
 
   searchInput.addEventListener("input", filterAndRender);
@@ -242,6 +290,8 @@ function setupLoadMore() {
   const btn = document.getElementById("loadMoreBtn");
   if (!btn) return;
   btn.addEventListener("click", () => {
+    // Only meaningful if not in showAllMode and not searching
+    if (showAllMode || isSearching) return;
     renderTable(false, videosPerPage);
   });
 }
@@ -250,7 +300,10 @@ function setupLoadAll() {
   const btn = document.getElementById("loadAllBtn");
   if (!btn) return;
   btn.addEventListener("click", () => {
+    // Latch: always show all from now on; hide counters & buttons
+    showAllMode = true;
     renderTable(true, activeList.length);
+    updateLoadButtons();
   });
 }
 
@@ -289,14 +342,8 @@ function sortTable(n, headerId) {
     return (x < y ? -1 : x > y ? 1 : 0) * (currentSortDirection === "asc" ? 1 : -1);
   });
 
-  renderTable(true, isSearching ? videosPerPage : lastShownCount);
-}
-
-function durationToSeconds(timeStr) {
-  const parts = String(timeStr || "").split(":").map(Number);
-  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-  if (parts.length === 2) return parts[0] * 60 + parts[1];
-  return parseInt(parts[0], 10) || 0;
+  // Keep everything visible if showAllMode or searching
+  renderTable(true, (showAllMode || isSearching) ? activeList.length : lastShownCount);
 }
 
 function updateVideoCount() {
@@ -325,19 +372,4 @@ function setupScrollToTop() {
   window.addEventListener("scroll", () => {
     btn.style.display = window.scrollY > 200 ? "block" : "none";
   });
-}
-
-
-
-/** Basic HTML escaping for safe rendering */
-function escapeHTML(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-function escapeAttr(str) {
-  return escapeHTML(str).replaceAll(" ", "%20");
 }

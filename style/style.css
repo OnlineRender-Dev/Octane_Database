@@ -109,13 +109,31 @@ body.narrow-layout .right-controls {
   padding: 10px 12px;
   font-size: 16px;
   width: 40%;
-  min-width: 240px;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text);
-  border-radius:10px;
-  outline:none;
+  min-width: 400px;
+  background: var(--card);
+  color: var(--text);
+  border-radius: 10px;
+  outline: none;
+
+  /* Gradient border */
+  border: 3px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  background-image:
+    linear-gradient(var(--card), var(--card)),
+    linear-gradient(45deg, #7e5bef, #3b82f6, #9333ea, #2563eb);
+  background-size: 100% 100%, 300% 300%;
+  animation: borderGradient 12s ease infinite;
 }
+
+@keyframes borderGradient {
+  0% { background-position: 0% 50%, 0% 50%; }
+  50% { background-position: 0% 50%, 100% 50%; }
+  100% { background-position: 0% 50%, 0% 50%; }
+}
+
+
+
 #searchInput:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.15); }
 
 #minDuration, #minViews {
@@ -311,4 +329,63 @@ body.dark .last-updated-top {
 }
 body.dark .submit-tutorial-link {
   color: var(--primary);
+}
+.sponsor-text {
+  text-align: center;
+  font-size: 14px;
+  color: var(--subtle);
+  margin-bottom: 15px;
+}
+
+.sponsor-text a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sponsor-text a:hover {
+  text-decoration: underline;
+}
+
+body.dark .sponsor-text {
+  color: var(--text);
+  opacity: 0.85;
+}
+
+#search-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* wrap on small screens */
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+}
+
+.search-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sponsor-right {
+  font-size: 14px;
+  color: var(--subtle);
+}
+
+.sponsor-right a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sponsor-right a:hover {
+  text-decoration: underline;
+}
+
+body.dark .sponsor-right {
+  color: var(--text);
+  opacity: 0.85;
 }
