@@ -786,9 +786,10 @@
     "views": 95,
     "duration": "2:03",
     "upload_date": "2025-08-05",
-    "thumbnail": "https://i.ytimg.com/vi/vALGaPu4l5c/hqdefault.jpg",
+    "thumbnail": "thumbs/vALGaPu4l5c.jpg",
     "url": "https://www.youtube.com/watch?v=vALGaPu4l5c",
-    "video_type": "Beginner Tutorial"
+    "video_type": "Beginner Tutorial",
+    "fallback_thumbnail": "https://i.ytimg.com/vi/vALGaPu4l5c/hqdefault.jpg"
   },
   {
     "title": "Blender Octane Plugin advanced texturing tutorial -  teaser 1",
@@ -1621,9 +1622,10 @@
     "views": 153,
     "duration": "4:59",
     "upload_date": "2025-08-08",
-    "thumbnail": "https://i.ytimg.com/vi/GDBH0jEyQEg/hqdefault.jpg",
+    "thumbnail": "thumbs/GDBH0jEyQEg.jpg",
     "url": "https://www.youtube.com/watch?v=GDBH0jEyQEg",
-    "video_type": "Beginner Tutorial"
+    "video_type": "Beginner Tutorial",
+    "fallback_thumbnail": "https://i.ytimg.com/vi/GDBH0jEyQEg/hqdefault.jpg"
   },
   {
     "title": "Replicate Matcaps with the Matcap Projection node - Blender Octane",
@@ -3413,9 +3415,10 @@
     "views": 31,
     "duration": "15:44",
     "upload_date": "2025-08-08",
-    "thumbnail": "https://i.ytimg.com/vi/pgqB7ame8jA/hqdefault.jpg",
+    "thumbnail": "thumbs/pgqB7ame8jA.jpg",
     "url": "https://www.youtube.com/watch?v=pgqB7ame8jA",
-    "video_type": "Beginner Tutorial"
+    "video_type": "Beginner Tutorial",
+    "fallback_thumbnail": "https://i.ytimg.com/vi/pgqB7ame8jA/hqdefault.jpg"
   },
   {
     "title": "FREE Octane Blender Guide Sun & Emission Nodes",
@@ -3511,9 +3514,10 @@
     "views": 319,
     "duration": "16:16",
     "upload_date": "2025-08-07",
-    "thumbnail": "https://i.ytimg.com/vi/pndBIC-2A7A/hqdefault.jpg",
+    "thumbnail": "thumbs/pndBIC-2A7A.jpg",
     "url": "https://www.youtube.com/watch?v=pndBIC-2A7A",
-    "video_type": "Beginner Tutorial"
+    "video_type": "Beginner Tutorial",
+    "fallback_thumbnail": "https://i.ytimg.com/vi/pndBIC-2A7A/hqdefault.jpg"
   },
   {
     "title": "Blender Octane Part 14 How To Make Glossy Material",
@@ -3532,9 +3536,10 @@
     "views": 46,
     "duration": "16:46",
     "upload_date": "2025-08-04",
-    "thumbnail": "https://i.ytimg.com/vi/abGoMG9MN4M/hqdefault.jpg",
+    "thumbnail": "thumbs/abGoMG9MN4M.jpg",
     "url": "https://www.youtube.com/watch?v=abGoMG9MN4M",
-    "video_type": "Beginner Tutorial"
+    "video_type": "Beginner Tutorial",
+    "fallback_thumbnail": "https://i.ytimg.com/vi/abGoMG9MN4M/hqdefault.jpg"
   },
   {
     "title": "Procedural Material Transition in Octane for Blender: Create Stunning Product Motion Graphics!",
@@ -3927,9 +3932,10 @@
     "views": 16,
     "duration": "22:53",
     "upload_date": "2025-08-08",
-    "thumbnail": "https://i.ytimg.com/vi/HNVR1w8Ml4w/hqdefault.jpg",
+    "thumbnail": "thumbs/HNVR1w8Ml4w.jpg",
     "url": "https://www.youtube.com/watch?v=HNVR1w8Ml4w",
-    "video_type": "Beginner Tutorial"
+    "video_type": "Beginner Tutorial",
+    "fallback_thumbnail": "https://i.ytimg.com/vi/HNVR1w8Ml4w/hqdefault.jpg"
   },
   {
     "title": "Blender Octane Tutorial | How to make Fast Scifi Scene in Blender Octane",
@@ -3959,10 +3965,10 @@
     "views": 2,
     "duration": "23:17",
     "upload_date": "2025-08-10",
-	"thumbnail": "thumbs/4W4WaygMSj0.jpg",
-	"url": "https://www.youtube.com/watch?v=4W4WaygMSj0",
-    "fallback_thumbnail": "https://i.ytimg.com/vi/4W4WaygMSj0/hqdefault.jpg",
-    "video_type": "Beginner Tutorial"
+    "thumbnail": "thumbs/4W4WaygMSj0.jpg",
+    "url": "https://www.youtube.com/watch?v=4W4WaygMSj0",
+    "video_type": "Beginner Tutorial",
+    "fallback_thumbnail": "https://i.ytimg.com/vi/4W4WaygMSj0/hqdefault.jpg"
   },
   {
     "title": "Blender Octane Tutorial | Creating covers in Blender Octane and Photoshop",
@@ -3981,9 +3987,10 @@
     "views": 11,
     "duration": "23:37",
     "upload_date": "2025-08-09",
-    "thumbnail": "https://i.ytimg.com/vi/QwVeQugPCXs/hqdefault.jpg",
+    "thumbnail": "thumbs/QwVeQugPCXs.jpg",
     "url": "https://www.youtube.com/watch?v=QwVeQugPCXs",
-    "video_type": "Beginner Tutorial"
+    "video_type": "Beginner Tutorial",
+    "fallback_thumbnail": "https://i.ytimg.com/vi/QwVeQugPCXs/hqdefault.jpg"
   },
   {
     "title": "Part 4: Projection Mapping and Fog in Blender 2.8 and Octane",
@@ -4222,9 +4229,10 @@
     "views": 6118,
     "duration": "29:38",
     "upload_date": "2025-08-03",
-    "thumbnail": "https://i.ytimg.com/vi/YbyXK4U1GuA/hqdefault.jpg",
+    "thumbnail": "thumbs/YbyXK4U1GuA.jpg",
     "url": "https://www.youtube.com/watch?v=YbyXK4U1GuA",
-    "video_type": "Beginner Tutorial"
+    "video_type": "Beginner Tutorial",
+    "fallback_thumbnail": "https://i.ytimg.com/vi/YbyXK4U1GuA/hqdefault.jpg"
   },
   {
     "title": "I Found a SECRET RENDER ENGINE in Blender 4.3",
