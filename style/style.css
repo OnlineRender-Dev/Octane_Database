@@ -315,17 +315,6 @@ body.dark .last-updated-top {
   color: var(--text);
 }
 
-.submit-tutorial-link {
-  position: absolute;
-  top: 38px;  /* just below Last Updated */
-  right: 20px;
-  font-size: 14px;
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 600;
-    /* Ensure it's clickable above backgrounds */
-  z-index: 10;
-}
 .submit-tutorial-link:hover {
   text-decoration: underline;
 }

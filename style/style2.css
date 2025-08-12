@@ -239,17 +239,6 @@ body.dark .last-updated-top {
 .logo-header img { max-width: 280px; height: auto; display: block; }
 .logo-text { font-size: 1rem; font-weight: 400; color: var(--text); }
 
-.submit-tutorial-link {
-  position: absolute;
-  top: 38px;
-  right: 20px;
-  font-size: 14px;
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 600;
-  z-index: 10;
-}
-.submit-tutorial-link:hover { text-decoration: underline; }
 
 .sponsor-text,
 .sponsor-right {
