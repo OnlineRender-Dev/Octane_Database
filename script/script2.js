@@ -1,8 +1,9 @@
 /* ===== CONFIG ===== */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/11UQ30w2GEIYPBhnZP1aiSz-pYtdKy_dUscjYWorW05o/export?format=csv&gid=4385312";
+const SHEET_ID = "11UQ30w2GEIYPBhnZP1aiSz-pYtdKy_dUscjYWorW05o";
 
-/* Progressive rendering: show all rows in batches so the UI stays responsive */
-const CHUNK_SIZE = 500; // rows per batch
+/* Progressive rendering: show rows in batches so the UI stays responsive */
+const CHUNK_SIZE = 500;
 
 const rIC = window.requestIdleCallback || function (cb) {
   return setTimeout(() => cb({ timeRemaining: () => 0, didTimeout: true }), 16);
@@ -13,17 +14,14 @@ let allRows = [];
 let activeRows = [];
 let fuse = null;
 
-let currentSortKey = null;       // e.g., "subscribers"
-let currentSortDir = "asc";      // "asc" | "desc"
+let currentSortKey = null;
+let currentSortDir = "asc";
 let isSearching = false;
 
 /* ===== UI Prefs (theme/layout/thumbs/description) ===== */
 function initTheme() {
   let saved = localStorage.getItem("theme");
-  if (!saved) {
-    saved = "dark"; // default
-    localStorage.setItem("theme", "dark");
-  }
+  if (!saved) { saved = "dark"; localStorage.setItem("theme", "dark"); }
   document.body.classList.toggle("dark", saved === "dark");
   const toggle = document.getElementById("themeToggle");
   if (toggle) toggle.checked = (saved === "dark");
@@ -38,7 +36,7 @@ function setupThemeToggle() {
   });
 }
 
-/* Infer from DOM on first load; keep DOM + storage + toggle in sync */
+/* Layout (wide/narrow) */
 function initLayoutToggle() {
   let saved = localStorage.getItem("layoutMode");
   if (!saved) {
@@ -56,20 +54,17 @@ function setupLayoutToggle() {
     const wide = toggle.checked;
     document.body.classList.toggle("narrow-layout", !wide);
     localStorage.setItem("layoutMode", wide ? "wide" : "narrow");
+    applyLayoutCoupling(); // keep Description behavior in sync
   });
 }
 
+/* Thumbnails toggle (kept for parity if you re-enable the UI) */
 function setupThumbsToggle() {
   const toggle = document.getElementById("toggleThumbs");
   if (!toggle) return;
-
   let saved = localStorage.getItem("showThumbs");
-  if (saved === null) {
-    saved = "true";
-    localStorage.setItem("showThumbs", "true");
-  }
+  if (saved === null) { saved = "true"; localStorage.setItem("showThumbs", "true"); }
   toggle.checked = saved === "true";
-
   toggle.addEventListener("change", () => {
     localStorage.setItem("showThumbs", toggle.checked ? "true" : "false");
     buildTableHeader();
@@ -85,7 +80,7 @@ function initDescriptionToggle() {
   const hide = (localStorage.getItem("hideDescription") === "true");
   document.body.classList.toggle("hide-description", hide);
   const t = document.getElementById("descToggle");
-  if (t) t.checked = !hide; // checked means "show"
+  if (t) t.checked = !hide; // checked = show
 }
 function setupDescriptionToggle() {
   const t = document.getElementById("descToggle");
@@ -95,6 +90,32 @@ function setupDescriptionToggle() {
     document.body.classList.toggle("hide-description", hide);
     localStorage.setItem("hideDescription", hide ? "true" : "false");
   });
+}
+
+/* Coupling: when narrow layout is enabled, always hide Description + disable toggle */
+function setDescriptionVisibility(show) {
+  document.body.classList.toggle("hide-description", !show);
+  const t = document.getElementById("descToggle");
+  if (t) t.checked = show;
+  localStorage.setItem("hideDescription", show ? "false" : "true");
+}
+function applyLayoutCoupling() {
+  const isWide = !document.body.classList.contains("narrow-layout");
+  const t = document.getElementById("descToggle");
+
+  if (!isWide) {
+    // going narrow: remember current preference (default: show)
+    const wasShowing = t ? t.checked : (localStorage.getItem("hideDescription") !== "true");
+    localStorage.setItem("prevDescShow_forWide", wasShowing ? "true" : "false");
+    setDescriptionVisibility(false);       // force hidden in narrow
+    if (t) t.disabled = true;              // disable UI
+  } else {
+    // back to wide: restore previous preference (default: show)
+    const prev = localStorage.getItem("prevDescShow_forWide");
+    const shouldShow = prev === null ? true : (prev === "true");
+    setDescriptionVisibility(shouldShow);
+    if (t) t.disabled = false;
+  }
 }
 
 /* ===== Utilities ===== */
@@ -123,12 +144,9 @@ function formatCompact(n) {
   }
 }
 
-/* ===== Strict M/D/YYYY parsing (e.g., 8/9/2025 ⇒ 09 Aug 2025) with validation ===== */
-function daysInMonth(y, m /* 1..12 */) {
-  return new Date(y, m, 0).getDate();
-}
+/* ===== Strict M/D/YYYY parsing with validation ===== */
+function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
 function parseMDYStrict(val) {
-  // Accepts: M/D/YYYY or MM/DD/YYYY (optionally with time HH:MM[:SS])
   const m = String(val).trim().match(
     /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
   );
@@ -145,28 +163,19 @@ function parseMDYStrict(val) {
   if (hh < 0 || hh > 23 || mm < 0 || mm > 59 || ss < 0 || ss > 59) return null;
   return new Date(y, mo - 1, d, hh, mm, ss);
 }
-
-/* Month-word fallback only (e.g., "10 Feb 2020") */
 function parseDate(val) {
   if (val == null) return null;
   const s = String(val).trim();
   if (!s) return null;
-
-  // 1) Strict M/D/YYYY (authoritative)
   const mdy = parseMDYStrict(s);
   if (mdy) return mdy;
-
-  // 2) Month words (lenient but still native Date)
   if (/[a-zA-Z]/.test(s)) {
     const cleaned = s.replace(/(\d)(st|nd|rd|th)/gi, "$1");
     const d = new Date(cleaned);
     return isNaN(d.getTime()) ? null : d;
   }
-
-  // 3) Otherwise invalid
   return null;
 }
-
 function formatDate(d) {
   if (!d) return "";
   return d.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
@@ -174,26 +183,20 @@ function formatDate(d) {
 function normalizeHeader(h) {
   return String(h || "").toLowerCase().replace(/[\s_]+/g, "");
 }
-
-/* Show only the handle part of Custom URL (text after @), fallback to clean path */
 function customUrlLabel(u) {
   const s = String(u || "").trim();
   if (!s) return "";
   const m = s.match(/@([^\/\?\#]+)/);
   if (m) return "@" + m[1];
-  return s
-    .replace(/^https?:\/\/(www\.)?youtube\.com\//i, "")
-    .replace(/^\/+/, "");
+  return s.replace(/^https?:\/\/(www\.)?youtube\.com\//i, "").replace(/^\/+/, "");
 }
 
-/* Tiny CSV parser (handles quotes, commas, newlines) */
+/* Tiny CSV parser */
 function parseCSV(text) {
   const rows = [];
   let i = 0, field = "", row = [], inQuotes = false;
-
   while (i < text.length) {
     const c = text[i];
-
     if (inQuotes) {
       if (c === '"') {
         if (text[i+1] === '"') { field += '"'; i += 2; continue; }
@@ -201,12 +204,10 @@ function parseCSV(text) {
       }
       field += c; i++; continue;
     }
-
     if (c === '"') { inQuotes = true; i++; continue; }
     if (c === ",") { row.push(field); field = ""; i++; continue; }
     if (c === "\n") { row.push(field); rows.push(row); field = ""; row = []; i++; continue; }
     if (c === "\r") { i++; continue; }
-
     field += c; i++;
   }
   row.push(field); rows.push(row);
@@ -219,21 +220,16 @@ const HEADER_SYNONYMS = {
   "channelid": "channel_id",
   "customurl": "custom_url",
   "customurl.": "custom_url",
-
   "subscribers": "subscribers",
   "views": "views",
   "videos": "videos",
-
   "channeltype": "channel_type",
   "country": "country",
   "created": "created",
-
   "description": "description",
   "descroption": "description",
-
   "profileimage": "profile_image",
   "profile_image": "profile_image",
-
   "fallbackimageurl": "fallback_image_url",
   "fallback_image_url": "fallback_image_url"
 };
@@ -263,30 +259,40 @@ const DISPLAY_LABELS = {
   custom_url: "Visit Channel"
 };
 
+/* ===== Last-Updated (Option A: ONLY Last-Modified header) ===== */
+function setLastUpdated(headers) {
+  const el = document.getElementById("last-updated");
+  if (!el) return;
+  const raw = headers.get("last-modified");
+  el.textContent = raw ? `Last Updated: ${new Date(raw).toLocaleString()}` : `Last Updated: unknown`;
+}
+
 /* ===== Fetch + bootstrap ===== */
 window.onload = async () => {
   initTheme();
   initLayoutToggle();
-
   setupThemeToggle();
   setupLayoutToggle();
   setupThumbsToggle();
 
-  initDescriptionToggle();     // new
-  setupDescriptionToggle();    // new
+  initDescriptionToggle();
+  setupDescriptionToggle();
 
-  hidePaginationUI(); // hide any leftover buttons/containers
+  // enforce Description behavior based on current layout
+  applyLayoutCoupling();
+
+  hidePaginationUI();
 
   try {
     const res = await fetch(CSV_URL, { cache: "no-store" });
     const csvText = await res.text();
-    setLastUpdatedFromHeaders(res.headers);
+    setLastUpdated(res.headers);
 
     const rows = parseCSV(csvText);
     const headers = rows[0] || [];
     const dataRows = rows.slice(1);
 
-    // build header map
+    // header map
     const headerMap = {};
     headers.forEach((h, idx) => {
       const norm = normalizeHeader(h);
@@ -294,55 +300,44 @@ window.onload = async () => {
       headerMap[key] = idx;
     });
 
-    // build data
+    // rows
     allRows = dataRows
-      .filter(r => r.some(cell => String(cell).trim() !== "")) // drop empty rows
+      .filter(r => r.some(cell => String(cell).trim() !== "")) // drop empty
       .map(r => {
         const get = (key, fallbackKeys = []) => {
           if (headerMap[key] !== undefined) return r[headerMap[key]] ?? "";
-          for (const alt of fallbackKeys) {
-            if (headerMap[alt] !== undefined) return r[headerMap[alt]] ?? "";
-          }
+          for (const alt of fallbackKeys) if (headerMap[alt] !== undefined) return r[headerMap[alt]] ?? "";
           return "";
         };
-
-        const channelName = get("channel_name");
-        const channelId   = get("channel_id");
-        const customUrl   = get("custom_url");
 
         const subs  = toNumber(get("subscribers"));
         const views = toNumber(get("views"));
         const vids  = toNumber(get("videos"));
 
-        const createdRaw = get("created");
-        const createdDate = parseDate(createdRaw); // STRICT M/D/YYYY first
+        const createdRaw  = get("created");
+        const createdDate = parseDate(createdRaw);
 
-        // description supports either "Description" or "Descroption"
-        const description = get("description", []);
-
-        // images
-        const profileRaw = get("profile_image");
-        const fallbackImg = get("fallback_image_url");
-        const profileUrl = resolveProfileImage(profileRaw);
+        const profileRaw  = get("profile_image");
+        const profileUrl  = resolveProfileImage(profileRaw);
 
         return {
-          channel_name: channelName,
-          channel_id: channelId,
-          custom_url: customUrl,
-          subscribers: subs,
-          views: views,
-          videos: vids,
+          channel_name: get("channel_name"),
+          channel_id:   get("channel_id"),
+          custom_url:   get("custom_url"),
+          subscribers:  subs,
+          views:        views,
+          videos:       vids,
           channel_type: get("channel_type"),
-          country: get("country"),
-          created: createdDate ? createdDate.toISOString() : createdRaw || "",
-          _createdDate: createdDate || null, // for sorting
-          description: description,
+          country:      get("country"),
+          created:      createdDate ? createdDate.toISOString() : createdRaw || "",
+          _createdDate: createdDate || null,
+          description:  get("description"),
           profile_image: profileUrl,
-          fallback_image_url: fallbackImg
+          fallback_image_url: get("fallback_image_url")
         };
       });
 
-    // Build search index
+    // search index
     if (window.Fuse) {
       fuse = new Fuse(allRows, {
         threshold: 0.32,
@@ -351,20 +346,17 @@ window.onload = async () => {
       });
     }
 
-    // Populate filters
     populateChannelTypeOptions(allRows);
-
-    // initial view
     activeRows = allRows.slice();
     buildTableHeader();
     renderTable(true);
     setupSearchAndFilters();
-    updateRowCount(); // initial text
+    updateRowCount();
 
   } catch (err) {
     console.error("Failed to load CSV:", err);
-    const lu = document.getElementById("last-updated");
-    if (lu) lu.textContent = `Last Updated: unknown`;
+    const el = document.getElementById("last-updated");
+    if (el) el.textContent = `Last Updated: unknown`;
     const tbody = getTBody();
     if (tbody) {
       const tr = document.createElement("tr");
@@ -380,8 +372,8 @@ window.onload = async () => {
 function resolveProfileImage(val) {
   const s = String(val || "").trim();
   if (!s) return "";
-  if (/^https?:\/\//i.test(s)) return s; // full URL
-  return `Profile_Images/${s}`;          // treat as filename in /Profile_Images/
+  if (/^https?:\/\//i.test(s)) return s;
+  return `Profile_Images/${s}`;
 }
 
 /* ===== Header + render ===== */
@@ -393,11 +385,11 @@ function buildTableHeader() {
   theadRow.innerHTML = "";
 
   DISPLAY_ORDER.forEach(key => {
-    if (!thumbs && key === "profile_image") return; // drop column if thumbs off
+    if (!thumbs && key === "profile_image") return;
     const th = document.createElement("th");
     th.textContent = DISPLAY_LABELS[key];
     th.dataset.key = key;
-    th.classList.add(`col-${key}`);     // column-specific class on header
+    th.classList.add(`col-${key}`);
     th.style.cursor = "pointer";
     th.addEventListener("click", () => sortBy(key, th));
     theadRow.appendChild(th);
@@ -411,10 +403,7 @@ function getTBody() {
 function renderTable(reset = true) {
   const tbody = getTBody();
   if (!tbody) return;
-
-  if (reset) {
-    tbody.innerHTML = "";
-  }
+  if (reset) tbody.innerHTML = "";
 
   const thumbs = isThumbsShown();
   let index = 0;
@@ -443,7 +432,7 @@ function renderTable(reset = true) {
         cells.push(td);
       }
 
-      // Channel Name (link)
+      // Channel Name
       const nameTd = document.createElement("td");
       const link = document.createElement("a");
       const href = row.custom_url
@@ -457,7 +446,7 @@ function renderTable(reset = true) {
       nameTd.classList.add("col-channel_name");
       cells.push(nameTd);
 
-      // Subscribers / Views / Videos
+      // Numbers
       const subsTd = document.createElement("td");
       subsTd.textContent = formatCompact(row.subscribers);
       subsTd.classList.add("col-subscribers");
@@ -478,25 +467,26 @@ function renderTable(reset = true) {
       typeTd.classList.add("col-channel_type");
       cells.push(typeTd);
 
-      // Country (text only from CSV)
+      // Country (text only)
       const countryTd = document.createElement("td");
       countryTd.textContent = (row.country || "").trim();
       countryTd.classList.add("col-country");
       cells.push(countryTd);
 
-      // Created (pretty)
+      // Created
       const createdTd = document.createElement("td");
       createdTd.textContent = row._createdDate ? formatDate(row._createdDate) : (row.created || "");
       createdTd.classList.add("col-created");
       cells.push(createdTd);
 
-      // Description
+      // Description (tooltip so clamped text can be read on hover)
       const descTd = document.createElement("td");
       descTd.textContent = row.description || "";
+      descTd.title = row.description || "";
       descTd.classList.add("col-description");
       cells.push(descTd);
 
-      // Visit Channel (handle only; title shows full URL)
+      // Visit Channel
       const urlTd = document.createElement("td");
       if (row.custom_url) {
         const a = document.createElement("a");
@@ -504,7 +494,7 @@ function renderTable(reset = true) {
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         a.textContent = customUrlLabel(row.custom_url);
-        a.title = row.custom_url; // tooltip with full URL
+        a.title = row.custom_url;
         urlTd.appendChild(a);
       } else {
         urlTd.textContent = "";
@@ -518,10 +508,7 @@ function renderTable(reset = true) {
 
     index = end;
     updateRowCount(index, activeRows.length);
-
-    if (index < activeRows.length) {
-      rIC(renderChunk); // schedule next chunk during idle time
-    }
+    if (index < activeRows.length) rIC(renderChunk);
   }
 
   renderChunk();
@@ -529,7 +516,6 @@ function renderTable(reset = true) {
 
 /* ===== Sorting ===== */
 function sortBy(key, thEl) {
-  // remove arrows
   const headerRow = document.getElementById("header-row");
   if (headerRow) {
     headerRow.querySelectorAll("th").forEach(th => {
@@ -537,20 +523,14 @@ function sortBy(key, thEl) {
     });
   }
 
-  if (currentSortKey === key) {
-    currentSortDir = currentSortDir === "asc" ? "desc" : "asc";
-  } else {
-    currentSortKey = key;
-    currentSortDir = "asc";
-  }
+  if (currentSortKey === key) currentSortDir = currentSortDir === "asc" ? "desc" : "asc";
+  else { currentSortKey = key; currentSortDir = "asc"; }
 
   if (thEl) thEl.textContent = DISPLAY_LABELS[key] + (currentSortDir === "asc" ? "↑" : "↓");
-
   const dir = currentSortDir === "asc" ? 1 : -1;
 
   activeRows.sort((a, b) => {
     let x, y;
-
     switch (key) {
       case "channel_name":
       case "channel_type":
@@ -590,7 +570,6 @@ function populateChannelTypeOptions(rows) {
     .sort((a, b) => a.localeCompare(b));
   sel.innerHTML = `<option value="">All Types</option>` + types.map(t => `<option value="${escapeHTML(t)}">${escapeHTML(t)}</option>`).join("");
 }
-
 function setupSearchAndFilters() {
   const searchInput = document.getElementById("searchInput");
   const minViews = document.getElementById("minViews");
@@ -605,7 +584,6 @@ function setupSearchAndFilters() {
 
     isSearching = Boolean(q) || minViewsVal > 0 || minVideosVal > 0 || Boolean(typeVal);
 
-    // search
     const base = q
       ? (fuse ? fuse.search(q).map(r => r.item) : allRows.filter(r =>
           (r.channel_name || "").toLowerCase().includes(q.toLowerCase()) ||
@@ -615,7 +593,6 @@ function setupSearchAndFilters() {
         ))
       : allRows;
 
-    // filter
     activeRows = base.filter(r =>
       (r.views  || 0) >= minViewsVal &&
       (r.videos || 0) >= minVideosVal &&
@@ -632,7 +609,7 @@ function setupSearchAndFilters() {
   typeSelect?.addEventListener("change", filterAndRender);
 }
 
-/* ===== Counts + last updated ===== */
+/* ===== Counts ===== */
 function updateRowCount(rendered = null, matched = null) {
   const total = allRows.length;
   const match = matched ?? activeRows.length;
@@ -640,18 +617,7 @@ function updateRowCount(rendered = null, matched = null) {
   const el = document.getElementById("video-count");
   if (el) {
     const still = shown < match ? ` (rendering… ${shown}/${match})` : "";
-    el.innerHTML = `Total Rows: ${total}<br>Showing ${Math.min(shown, match)} of ${match}${still}`;
-  }
-}
-function setLastUpdatedFromHeaders(headers) {
-  const lu = document.getElementById("last-updated");
-  if (!lu) return;
-  const lm = headers.get("last-modified");
-  if (lm) {
-    const d = new Date(lm);
-    lu.textContent = `Last Updated: ${d.toLocaleDateString()}`;
-  } else {
-    lu.textContent = `Last Updated: unknown`;
+    el.innerHTML = `Total Channels: ${total}<br>Showing ${Math.min(shown, match)} of ${match}${still}`;
   }
 }
 
@@ -680,3 +646,4 @@ function hidePaginationUI() {
   if (more) more.style.display = "none";
   if (all) all.style.display = "none";
 }
+

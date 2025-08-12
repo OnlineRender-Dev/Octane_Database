@@ -269,6 +269,8 @@ body.dark .last-updated-top {
 body.dark .sponsor-text,
 body.dark .sponsor-right { color: var(--text); opacity: 0.85; }
 
+.sponsor-right { align-self: center; margin-bottom: 0; }
+
 
 /* Inputs & Buttons */
 #minVideos, #minViews, #channelType {
@@ -364,3 +366,55 @@ body.hide-description th.col-description,
 body.hide-description td.col-description {
   display: none;
 }
+
+/* In narrow layout, clamp description so rows don't get gigantic */
+.narrow-layout td.col-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 8; /* ← number of lines to show */
+  overflow: hidden;
+  max-height: calc(1.4em * 8); /* line-height * lines; keeps height consistent */
+}
+
+/* Optional: slightly narrower description in narrow layout */
+.narrow-layout th.col-description,
+.narrow-layout td.col-description {
+  width: 30%;
+  max-width: 540px;
+}
+
+/* When a switch input is disabled, dim it */
+.switch input:disabled + .slider { opacity: .5; cursor: not-allowed; }
+.switch input:disabled ~ .switch-label { opacity: .6; }
+
+/* Brand bar */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px;
+}
+
+.brand .logo-text { margin: 0; } /* brand handles the spacing */
+
+.home-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+}
+
+.home-link:hover {
+  background: #202734;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+}
+
+.home-icon { display: block; }

@@ -403,3 +403,35 @@ body.dark .sponsor-right {
   outline: none;
 }
 #videoType:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+
+/* Brand bar */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px;
+}
+
+.brand .logo-text { margin: 0; } /* brand handles the spacing */
+
+.home-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+}
+
+.home-link:hover {
+  background: #202734;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+}
+
+.home-icon { display: block; }

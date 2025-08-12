@@ -2,12 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>CSV Data Viewer</title>
+  <title>Blender Youtube Channels</title>
 
   <!-- Styles -->
   <link rel="stylesheet" href="style/style2.css" />
 
-  <!-- (Optional) Fuse.js for search like your original -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
   <script
     src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js"
@@ -16,13 +15,22 @@
 </head>
 
 <body class="hide-thumbnails">
-  <span class="logo-text">Blender Channel Database</span>
+  <!-- Brand / title -->
+<div class="brand">
+  <a class="home-link" href="index.html" aria-label="Home">
+    <svg class="home-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/>
+    </svg>
+  </a>
+  <span class="logo-text">View Tutorial Database</span>
+</div>
 
-  <div class="last-updated-top" id="last-updated">Last Updated: ...</div>
 
-  <!-- Optional submission link (kept to mimic layout) -->
-  <a class="submit-tutorial-link" href="#" target="_blank" rel="noopener">
-    &nbsp;
+
+
+
+  <a class="submit-tutorial-link" href="https://docs.google.com/forms/d/e/1FAIpQLSc9i8POw2RVwwhpRlKfM3F4VRk06nWhVQAMh_bBByLo1GcQAA/viewform?usp=dialog" target="_blank" rel="noopener">
+    Submit Channel
   </a>
 
   <!-- Logo / header -->
@@ -36,7 +44,7 @@
     ></dotlottie-wc>
   </div>
 
-  <div class="sponsor-text"></div>
+
 
   <!-- Search + filters -->
   <div id="search-container">
@@ -70,7 +78,7 @@
       </select>
     </div>
 
-    <div class="sponsor-right">&nbsp;</div>
+    <div class="sponsor-right">Sponsored by <a href="https://rendernetwork.com" target="_blank" rel="noopener">Render Network</a></div>
   </div>
 
   <!-- Controls -->
