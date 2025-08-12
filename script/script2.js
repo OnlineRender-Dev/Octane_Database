@@ -17,7 +17,7 @@ let currentSortKey = null;       // e.g., "subscribers"
 let currentSortDir = "asc";      // "asc" | "desc"
 let isSearching = false;
 
-/* ===== UI Prefs (theme/layout/thumbs) ===== */
+/* ===== UI Prefs (theme/layout/thumbs/description) ===== */
 function initTheme() {
   let saved = localStorage.getItem("theme");
   if (!saved) {
@@ -80,6 +80,23 @@ function isThumbsShown() {
   return (localStorage.getItem("showThumbs") ?? "true") === "true";
 }
 
+/* Description column toggle */
+function initDescriptionToggle() {
+  const hide = (localStorage.getItem("hideDescription") === "true");
+  document.body.classList.toggle("hide-description", hide);
+  const t = document.getElementById("descToggle");
+  if (t) t.checked = !hide; // checked means "show"
+}
+function setupDescriptionToggle() {
+  const t = document.getElementById("descToggle");
+  if (!t) return;
+  t.addEventListener("change", () => {
+    const hide = !t.checked;
+    document.body.classList.toggle("hide-description", hide);
+    localStorage.setItem("hideDescription", hide ? "true" : "false");
+  });
+}
+
 /* ===== Utilities ===== */
 function escapeHTML(str) {
   return String(str ?? "")
@@ -106,7 +123,7 @@ function formatCompact(n) {
   }
 }
 
-/* ===== Strict M/D/Y parsing (e.g., 8/9/2025 ⇒ 09 Aug 2025) with validation ===== */
+/* ===== Strict M/D/YYYY parsing (e.g., 8/9/2025 ⇒ 09 Aug 2025) with validation ===== */
 function daysInMonth(y, m /* 1..12 */) {
   return new Date(y, m, 0).getDate();
 }
@@ -129,7 +146,7 @@ function parseMDYStrict(val) {
   return new Date(y, mo - 1, d, hh, mm, ss);
 }
 
-/* Robust fallback ONLY for month-word formats (e.g., "10 Feb 2020") */
+/* Month-word fallback only (e.g., "10 Feb 2020") */
 function parseDate(val) {
   if (val == null) return null;
   const s = String(val).trim();
@@ -139,14 +156,14 @@ function parseDate(val) {
   const mdy = parseMDYStrict(s);
   if (mdy) return mdy;
 
-  // 2) Month words (e.g., "10 Feb 2020") as a lenient fallback
+  // 2) Month words (lenient but still native Date)
   if (/[a-zA-Z]/.test(s)) {
     const cleaned = s.replace(/(\d)(st|nd|rd|th)/gi, "$1");
     const d = new Date(cleaned);
     return isNaN(d.getTime()) ? null : d;
   }
 
-  // 3) Otherwise, treat as invalid
+  // 3) Otherwise invalid
   return null;
 }
 
@@ -167,19 +184,6 @@ function customUrlLabel(u) {
   return s
     .replace(/^https?:\/\/(www\.)?youtube\.com\//i, "")
     .replace(/^\/+/, "");
-}
-
-/* Country → flag helpers (emoji; no images). Expect ISO-2 codes like US, IN, CA. */
-function toISO2(code) {
-  if (!code) return "";
-  const s = String(code).trim().toUpperCase();
-  if (s === "UK") return "GB";              // alias
-  return /^[A-Z]{2}$/.test(s) ? s : "";
-}
-function flagEmojiFromISO2(cc) {
-  if (!cc) return "";
-  const A = 0x1F1E6;
-  return String.fromCodePoint(A + (cc.charCodeAt(0) - 65), A + (cc.charCodeAt(1) - 65));
 }
 
 /* Tiny CSV parser (handles quotes, commas, newlines) */
@@ -263,9 +267,14 @@ const DISPLAY_LABELS = {
 window.onload = async () => {
   initTheme();
   initLayoutToggle();
+
   setupThemeToggle();
   setupLayoutToggle();
   setupThumbsToggle();
+
+  initDescriptionToggle();     // new
+  setupDescriptionToggle();    // new
+
   hidePaginationUI(); // hide any leftover buttons/containers
 
   try {
@@ -306,7 +315,7 @@ window.onload = async () => {
         const vids  = toNumber(get("videos"));
 
         const createdRaw = get("created");
-        const createdDate = parseDate(createdRaw); // STRICT M/D/Y first
+        const createdDate = parseDate(createdRaw); // STRICT M/D/YYYY first
 
         // description supports either "Description" or "Descroption"
         const description = get("description", []);
@@ -469,13 +478,9 @@ function renderTable(reset = true) {
       typeTd.classList.add("col-channel_type");
       cells.push(typeTd);
 
-      // Country (code then flag)
+      // Country (text only from CSV)
       const countryTd = document.createElement("td");
-      const rawCountry = (row.country || "").trim();
-      const cc = toISO2(rawCountry);           // only accept ISO-2 (UK→GB)
-      const flag = flagEmojiFromISO2(cc);
-      countryTd.textContent = cc ? `${cc} ${flag}` : rawCountry;
-      countryTd.title = rawCountry || cc;
+      countryTd.textContent = (row.country || "").trim();
       countryTd.classList.add("col-country");
       cells.push(countryTd);
 
@@ -675,4 +680,3 @@ function hidePaginationUI() {
   if (more) more.style.display = "none";
   if (all) all.style.display = "none";
 }
-
