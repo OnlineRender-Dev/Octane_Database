@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CSV Data Viewer</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style/style2.css" />
+
+  <!-- (Optional) Fuse.js for search like your original -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+  <script
+    src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js"
+    type="module"
+  ></script>
+</head>
+
+<body class="hide-thumbnails narrow-layout">
+  <span class="logo-text">CSV DATA VIEWER</span>
+
+  <div class="last-updated-top" id="last-updated">Last Updated: ...</div>
+
+  <!-- Optional submission link (kept to mimic layout) -->
+  <a class="submit-tutorial-link" href="#" target="_blank" rel="noopener">
+    &nbsp;
+  </a>
+
+  <!-- Logo / header -->
+  <div class="logo-header">
+    <dotlottie-wc
+      src="https://lottie.host/8d355ffa-9e83-46a6-bbc7-84a30c80545e/q7qlmnUoJG.lottie"
+      style="width: 300px; height: 300px"
+      speed="1"
+      autoplay
+      loop
+    ></dotlottie-wc>
+  </div>
+
+  <div class="sponsor-text"></div>
+
+  <!-- Search + filters -->
+  <div id="search-container">
+    <div class="search-left">
+      <input type="text" id="searchInput" placeholder="Search rows..." />
+
+      <!-- Min Videos -->
+      <select id="minVideos">
+        <option value="0">Min Videos</option>
+        <option value="10">10+</option>
+        <option value="50">50+</option>
+        <option value="100">100+</option>
+        <option value="500">500+</option>
+        <option value="1000">1,000+</option>
+      </select>
+
+      <!-- Min Views -->
+      <select id="minViews">
+        <option value="0">Min Views</option>
+        <option value="1000">1,000+</option>
+        <option value="10000">10,000+</option>
+        <option value="50000">50,000+</option>
+        <option value="100000">100,000+</option>
+        <option value="500000">500,000+</option>
+        <option value="1000000">1,000,000+</option>
+      </select>
+
+      <!-- Channel Type (auto-populated) -->
+      <select id="channelType">
+        <option value="">Channel Type</option>
+      </select>
+    </div>
+
+    <div class="sponsor-right">&nbsp;</div>
+  </div>
+
+  <!-- Controls -->
+  <div id="controls">
+    <div class="left-controls">
+      <!-- Dark mode -->
+      <label class="switch">
+        <input type="checkbox" id="themeToggle" />
+        <span class="slider"></span>
+        <span class="switch-label">Dark Mode</span>
+      </label>
+
+      <!-- Layout width -->
+      <label class="switch">
+        <input type="checkbox" id="layoutToggle" />
+        <span class="slider"></span>
+        <span class="switch-label">Wide Layout</span>
+      </label>
+
+      <!-- Thumbnails toggle (removed UI; JS will still show images if enabled in storage) -->
+      <!--
+      <label class="switch">
+        <input type="checkbox" id="toggleThumbs" />
+        <span class="slider"></span>
+        <span class="switch-label">Show Thumbnails</span>
+      </label>
+      -->
+    </div>
+
+    <div class="right-controls">
+      <div id="video-count">
+        Total Channels: ...<br />
+        Showing ... of ...
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div id="table-container">
+    <table id="data-table">
+      <thead>
+        <tr id="header-row"></tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <!-- Removed: Load more / Load all UI -->
+
+  <!-- Back to top -->
+  <button id="scrollTopBtn" title="Back to Top">↑</button>
+
+  <!-- App script -->
+  <script src="script/script2.js"></script>
+</body>
+</html>
