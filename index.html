@@ -139,31 +139,35 @@
 
 
   <!-- Table -->
-  <div id="table-container">
-    <table id="video-table">
-      <colgroup>
-        <col class="col-thumb">
-        <col class="col-title">
-        <col class="col-channel">
-        <col class="col-views">
-        <col class="col-duration">
-        <col class="col-date">
-        <col class="col-link">
-      </colgroup>
-      <thead>
-        <tr>
-          <th class="thumbnail-header">Thumbnail</th>
-          <th id="th-title" onclick="sortTable(1, 'th-title')">Title</th>
-          <th id="th-channel" onclick="sortTable(2, 'th-channel')">Channel</th>
-          <th id="th-views" onclick="sortTable(3, 'th-views')">Views</th>
-          <th id="th-duration" onclick="sortTable(4, 'th-duration')">Duration</th>
-          <th id="th-date" onclick="sortTable(5, 'th-date')">Upload Date</th>
-          <th>Link</th>
-        </tr>
-      </thead>
-      <tbody id="video-body"></tbody>
-    </table>
-  </div>
+<!-- Table -->
+<div id="table-container">
+  <table id="video-table">
+    <colgroup>
+      <col class="col-thumb">
+      <col class="col-title">
+      <col class="col-channel">
+      <col class="col-type">
+      <col class="col-views">
+      <col class="col-duration">
+      <col class="col-date">
+      <col class="col-link">
+    </colgroup>
+    <thead>
+      <tr>
+        <th class="thumbnail-header">Thumbnail</th>
+        <th id="th-title"   onclick="sortTable(1, 'th-title')">Title</th>
+        <th id="th-channel" onclick="sortTable(2, 'th-channel')">Channel</th>
+        <th id="th-type"    onclick="sortTable(3, 'th-type')">Video Category</th> <!-- NEW -->
+        <th id="th-views"   onclick="sortTable(4, 'th-views')">Views</th>       <!-- shifted -->
+        <th id="th-duration"onclick="sortTable(5, 'th-duration')">Duration</th> <!-- shifted -->
+        <th id="th-date"    onclick="sortTable(6, 'th-date')">Upload Date</th>  <!-- shifted -->
+        <th>Link</th>
+      </tr>
+    </thead>
+    <tbody id="video-body"></tbody>
+  </table>
+</div>
+
 
   <!-- Load more -->
   <div id="load-more-container">

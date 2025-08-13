@@ -474,3 +474,17 @@ body.dark .sponsor-right {
   }
 }
 
+/* Make the Type column narrower + truncate */
+#video-table { table-layout: fixed; }            /* respect column widths */
+#video-table .col-type { width: 30ch; }          /* or 120–160px, your call */
+
+#video-table th:nth-child(4),
+#video-table td:nth-child(4) {
+  width: 30ch;                                   /* keep header + cells aligned */
+}
+
+#video-table td:nth-child(4) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
