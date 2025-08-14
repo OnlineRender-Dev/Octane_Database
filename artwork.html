@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Artwork Gallery</title>
+    <link rel="stylesheet" href="style/artwork.css" />
+    <!-- optional: silence favicon 404s during local dev -->
+    <link rel="icon" href="data:,">
+  </head>
+  <body>
+<!-- Lottie script -->
+<script
+  src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js"
+  type="module"
+></script>
+
+<header class="site-header" role="banner">
+  <div class="header-inner">
+    <!-- Left: logo only -->
+    <div class="logo-left">
+      <dotlottie-wc
+        src="https://lottie.host/e6e9b07e-23cd-442e-85bf-734efdb94cf1/MXOscgkUAa.lottie"
+        style="width: 60px; height: 60px"
+        speed="1"
+        autoplay
+        loop
+      ></dotlottie-wc>
+    </div>
+
+    <!-- Center: title only (stays mathematically centered) -->
+    <h1 class="title-center">Octane Blender Artwork</h1>
+
+    <!-- Right: submit button -->
+    <button type="submit" class="submit-btn">Submit</button>
+  </div>
+
+  <p class="subheader">A curated collection of stunning artwork</p>
+</header>
+
+
+
+<main id="main" class="container" role="main">
+  <section class="controls" aria-label="Gallery controls">
+    <div id="stats" class="stats">
+      Total: <span id="totalAll">0</span> |
+      Images: <span id="totalImages">0</span> |
+      Videos: <span id="totalVideos">0</span>
+    </div>
+
+    <!-- Type filter first -->
+    <label class="filter">
+      <span>Type:</span>
+      <span class="select-wrap">
+        <select id="typeFilter" class="select">
+          <option value="all">All</option>
+          <option value="image">Images</option>
+          <option value="video">Videos</option>
+          <option value="featured">Featured</option>
+        </select>
+      </span>
+    </label>
+
+    <!-- Show details toggle -->
+    <label class="toggle" for="captionsToggle">
+      <input id="captionsToggle" type="checkbox" class="toggle-input" />
+      <span class="toggle-pill" aria-hidden="true">
+        <span class="knob"></span>
+      </span>
+      <span class="toggle-text">Show details</span>
+    </label>
+
+    <!-- Shuffle button commented out -->
+    <!--
+    <button id="shuffleBtn" class="btn" type="button" title="Shuffle images">
+      Shuffle
+    </button>
+    -->
+  </section>
+
+
+  <section id="gallery" class="gallery" aria-live="polite" aria-busy="true"></section>
+
+  <div class="load-more-wrap">
+    <button id="loadMoreBtn" class="btn load-more" type="button">Load more</button>
+  </div>
+</main>
+
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" aria-hidden="true" aria-label="Image viewer" role="dialog">
+      <button class="lb-close" id="lbClose" aria-label="Close viewer">×</button>
+      <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous image">‹</button>
+      <button class="lb-nav lb-next" id="lbNext" aria-label="Next image">›</button>
+      <img id="lbImage" alt="" />
+      <div id="lbCaption" class="lb-caption" aria-live="polite"></div>
+    </div>
+
+    <!-- Thumbnail template -->
+    <template id="thumbTemplate">
+      <figure class="thumb" role="group">
+        <img loading="lazy" decoding="async" alt="Artwork thumbnail" />
+        <figcaption class="caption" aria-hidden="true"></figcaption>
+      </figure>
+    </template>
+
+    <!-- SVG sprite (link, play, featured star) -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+      <symbol id="icon-link" viewBox="0 0 24 24">
+        <path d="M3.9 12a5 5 0 0 1 5-5h4v2h-4a3 3 0 0 0 0 6h4v2h-4a5 5 0 0 1-5-5zm7-1h2v2h-2v-2zm4.1-4h-4V5h4a5 5 0 0 1 0 10h-4v-2h4a3 3 0 0 0 0-6z"/>
+      </symbol>
+      <symbol id="icon-play" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"></path>
+      </symbol>
+      <symbol id="icon-star" viewBox="0 0 24 24">
+        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+      </symbol>
+    </svg>
+
+    <script src="script/artwork.js" defer></script>
+  </body>
+</html>
