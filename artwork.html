@@ -5,90 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Artwork Gallery</title>
     <link rel="stylesheet" href="style/artwork.css" />
-    <!-- optional: silence favicon 404s during local dev -->
-    <link rel="icon" href="data:,">
+    <link rel="icon" type="image/x-icon" href="Images/favicon.ico">
   </head>
+
   <body>
-<!-- Lottie script -->
-<script
-  src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js"
-  type="module"
-></script>
+    <!-- Lottie script -->
+    <script
+      src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js"
+      type="module"
+    ></script>
 
-<header class="site-header" role="banner">
-  <div class="header-inner">
-    <!-- Left: logo only -->
-    <div class="logo-left">
-  <dotlottie-wc
-  src="https://lottie.host/9c346f27-adfd-4150-b77a-bb3ad87aa393/wGNxopOa7X.lottie"
-  style="width: 50px;height: 50px"
-  speed="1"
-  autoplay
-  loop
-></dotlottie-wc>
-    </div>
+    <header class="site-header" role="banner">
+      <!-- TOP-LEFT BAR -->
+      <div class="site-topbar">
+        <nav class="top-left-nav" aria-label="Primary">
+          <a class="home" href="/" aria-label="Home">
+            <svg aria-hidden="true"><use href="#icon-home"></use></svg>
+          </a>
+          <a href="#link1">Link 1</a>
+          <a href="#link2">Link 2</a>
+          <a href="#link3">Link 3</a>
+        </nav>
+      </div>
 
-    <!-- Center: title only (stays mathematically centered) -->
-    <h1 class="title-center">Octane Blender Artwork</h1>
+      <div class="header-inner">
+        <!-- Left: logo -->
+        <div class="logo-left">
+          <dotlottie-wc
+            src="https://lottie.host/d262a567-2362-4114-aacb-e7a2414d19d6/GsqLVjP0yB.lottie"
+            style="width: 150px;height: 150px"
+            speed="1"
+            autoplay
+            loop
+          ></dotlottie-wc>
+        </div>
 
-    <!-- Right: submit button -->
-    <button type="button" class="submit-btn" onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSdxQwXzhWZ5uJUh2VZ9B78SiN8IQU-Wn0XyOs0z4mIViy-HbA/viewform?usp=dialog';">
-  Submit
-</button>
+        <!-- Center: title -->
+        <h1 class="title-center">Octane Blender Artwork</h1>
 
-  </div>
+        <!-- Right: submit -->
+        <button
+          type="button"
+          class="submit-btn"
+          onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSdxQwXzhWZ5uJUh2VZ9B78SiN8IQU-Wn0XyOs0z4mIViy-HbA/viewform?usp=dialog';"
+        >
+          Submit
+        </button>
+      </div>
 
-  <p class="subheader">A curated collection of stunning artwork</p>
-</header>
+      <p class="subheader">A curated collection of stunning artwork created by the Blender Octane community</p>
+    </header>
 
+    <main id="main" class="container" role="main">
+      <section class="controls" aria-label="Gallery controls">
+        <div id="stats" class="stats">
+          Total: <span id="totalAll">0</span> |
+          Images: <span id="totalImages">0</span> |
+          Videos: <span id="totalVideos">0</span>
+        </div>
 
+        <!-- Type filter -->
+        <label class="filter">
+          <span>Type:</span>
+          <span class="select-wrap">
+            <select id="typeFilter" class="select">
+              <option value="all">All</option>
+              <option value="image">Images</option>
+              <option value="video">Videos</option>
+              <option value="featured">Featured</option>
+            </select>
+          </span>
+        </label>
 
-<main id="main" class="container" role="main">
-  <section class="controls" aria-label="Gallery controls">
-    <div id="stats" class="stats">
-      Total: <span id="totalAll">0</span> |
-      Images: <span id="totalImages">0</span> |
-      Videos: <span id="totalVideos">0</span>
-    </div>
+        <!-- Show details toggle -->
+        <label class="toggle">
+          <input id="captionsToggle" type="checkbox" class="toggle-input" />
+          <span class="toggle-pill" aria-hidden="true">
+            <span class="knob"></span>
+          </span>
+          <span class="toggle-text">Show details</span>
+        </label>
 
-    <!-- Type filter first -->
-    <label class="filter">
-      <span>Type:</span>
-      <span class="select-wrap">
-        <select id="typeFilter" class="select">
-          <option value="all">All</option>
-          <option value="image">Images</option>
-          <option value="video">Videos</option>
-          <option value="featured">Featured</option>
-        </select>
-      </span>
-    </label>
+        <!-- Optional Shuffle
+        <button id="shuffleBtn" class="btn" type="button" title="Shuffle images">
+          Shuffle
+        </button>
+        -->
+      </section>
 
-    <!-- Show details toggle -->
-    <label class="toggle" for="captionsToggle">
-      <input id="captionsToggle" type="checkbox" class="toggle-input" />
-      <span class="toggle-pill" aria-hidden="true">
-        <span class="knob"></span>
-      </span>
-      <span class="toggle-text">Show details</span>
-    </label>
+      <section id="gallery" class="gallery" aria-live="polite" aria-busy="true"></section>
 
-    <!-- Shuffle button commented out -->
-    <!--
-    <button id="shuffleBtn" class="btn" type="button" title="Shuffle images">
-      Shuffle
-    </button>
-    -->
-  </section>
-
-
-  <section id="gallery" class="gallery" aria-live="polite" aria-busy="true"></section>
-
-  <div class="load-more-wrap">
-    <button id="loadMoreBtn" class="btn load-more" type="button">Load more</button>
-  </div>
-</main>
-
+      <div class="load-more-wrap">
+        <button id="loadMoreBtn" class="btn load-more" type="button">Load more</button>
+      </div>
+    </main>
 
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox" aria-hidden="true" aria-label="Image viewer" role="dialog">
@@ -107,16 +117,26 @@
       </figure>
     </template>
 
-    <!-- SVG sprite (link, play, featured star) -->
+    <!-- SVG sprite (link, play, star, home) -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+      <!-- External link (updated) -->
       <symbol id="icon-link" viewBox="0 0 24 24">
-        <path d="M3.9 12a5 5 0 0 1 5-5h4v2h-4a3 3 0 0 0 0 6h4v2h-4a5 5 0 0 1-5-5zm7-1h2v2h-2v-2zm4.1-4h-4V5h4a5 5 0 0 1 0 10h-4v-2h4a3 3 0 0 0 0-6z"/>
+        <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h5V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-5h-2v5H5V5z"/>
       </symbol>
+
+      <!-- Play -->
       <symbol id="icon-play" viewBox="0 0 24 24">
         <path d="M8 5v14l11-7z"></path>
       </symbol>
+
+      <!-- Star -->
       <symbol id="icon-star" viewBox="0 0 24 24">
         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+      </symbol>
+
+      <!-- Home -->
+      <symbol id="icon-home" viewBox="0 0 24 24">
+        <path d="M12 3.1 3 10v10h6v-6h6v6h6V10l-9-6.9zM19 12v6h-2v-6h-4v-3.2l6 4.6z"/>
       </symbol>
     </svg>
 

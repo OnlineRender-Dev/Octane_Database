@@ -260,32 +260,51 @@
     updateCounts();
   }
 
-  // ── Lightbox functions (navigate within *visible* slice)
-  function openLightbox(iVisible) {
-    const visible = getVisibleSlice();
-    const it = visible[iVisible];
-    if (!it) return;
-    currentIndex = iVisible;
+// ── Lightbox functions (navigate within *visible* slice)
+function openLightbox(iVisible) {
+  const visible = getVisibleSlice();
+  const it = visible[iVisible];
+  if (!it) return;
+  currentIndex = iVisible;
 
-    if (it.artworkType === 'image') {
-      ensureLbFrame(null);
-      lbImg.style.display = '';
-      lbImg.src = it.src;
-    } else {
-      lbImg.style.display = 'none';
-      lbImg.src = '';
-      ensureLbFrame(it.embedUrl);
-    }
-
-    lbCaption.innerHTML =
-      `${escapeHtml(it.title || it.name || '')}` +
-      (it.artist ? ` | ${escapeHtml(it.artist)}` : '') +
-      (it.link ? ` | <a href="${it.link}" target="_blank" rel="noopener">Link</a>` : '') +
-      ` | ${it.artworkType === 'video' ? 'Video' : 'Image'}`;
-
-    lb.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('modal-open');
+  if (it.artworkType === 'image') {
+    ensureLbFrame(null);
+    lbImg.style.display = '';
+    lbImg.src = it.src;
+  } else {
+    lbImg.style.display = 'none';
+    lbImg.src = '';
+    ensureLbFrame(it.embedUrl);
   }
+
+  // Build caption in this order: Artist | Title | Link
+const artist = it.artist && it.artist.trim() ? escapeHtml(it.artist) : '';
+const title  = escapeHtml(it.title || it.name || '');
+
+const rawUrl   = String(it.link || '').trim();
+const safeUrl  = escapeHtml(rawUrl);                  // for text/title
+const hrefAttr = rawUrl.replace(/"/g, '&quot;');      // for href attribute
+
+const linkHtml = rawUrl
+  ? '<a class="lb-link" href="' + hrefAttr + '" target="_blank" rel="noopener noreferrer" title="' + safeUrl + '" aria-label="Open external link">' +
+      '<svg class="lb-link-icon" aria-hidden="true"><use href="#icon-link"></use></svg>' +
+      '<span class="lb-link-text">' + safeUrl + '</span>' +
+    '</a>'
+  : '';
+
+const parts = [];
+if (artist) parts.push(artist);
+if (title)  parts.push(title);
+if (linkHtml) parts.push(linkHtml);
+
+lbCaption.innerHTML = parts.join(' | ');
+
+
+
+  lb.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+}
+
 
   function closeLightbox() {
     lb.setAttribute('aria-hidden', 'true');
