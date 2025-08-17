@@ -1,0 +1,219 @@
+/* =========================================================
+   Community Page — Cards with Animated Purple Ring
+   ========================================================= */
+
+/* --- Settings --- */
+:root {
+  /* Colors */
+  --bg: hsl(220 18% 8%);
+  --surface: hsl(220 18% 12%);
+  --text: hsl(220 15% 92%);
+
+  --primary-from: hsl(210 100% 60%);
+  --primary-to:   hsl(280 100% 65%);
+  --radius: 16px;
+
+  --page-pad: 24px;
+  --header-h: 96px;
+  --intro-offset: 100px;
+  --btn-ease: cubic-bezier(.2,.8,.25,1);
+
+  --footer-h: 56px;
+
+  --hl-purple: #9b5cff;
+  --hl-gpu:    #9b5cff;
+}
+
+/* --- Base --- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: radial-gradient(80% 60% at 50% 40%, var(--surface), var(--bg));
+  color: var(--text);
+  font: 500 18px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- Header --- */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: 14px var(--page-pad);
+  min-height: var(--header-h);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0));
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.brand-area { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; line-height: 1.1; }
+.brand { color: var(--text); text-decoration: none; font-weight: 800; font-size: 1.25rem; }
+.sponsor { color: var(--text); opacity: 0.7; font-size: 0.82rem; }
+.sponsor-link { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.sponsor-link:hover { opacity: 0.95; }
+
+/* Topnav */
+.topnav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.topnav a {
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.85;
+  font-weight: 600;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+.topnav a:hover { opacity: 1; transform: translateY(-1px); }
+.topnav a + a::before { content: "|"; opacity: 0.6; margin: 0 10px 0 2px; }
+
+/* Community active */
+.topnav a:nth-child(3),
+.topnav a:nth-child(3):visited {
+  color: var(--hl-purple);
+  opacity: 1;
+  font-weight: 800;
+  background-color: rgba(155, 92, 255, 0.12);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.topnav a:nth-child(3)::before { content: none; }
+.topnav a:nth-child(2)::after { content: "|"; opacity: 0.6; margin: 0 10px 0 2px; }
+
+/* --- Main --- */
+.center-stage {
+  position: absolute;
+  top: var(--header-h);
+  left: 0; right: 0; bottom: var(--footer-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--page-pad);
+  text-align: center;
+  overflow-y: auto;
+}
+
+/* --- Cards --- */
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 16px 20px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: visible;
+}
+.card + .card { margin-top: 12px; }
+
+/* Hover lift only (no purple stroke here) */
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  border-color: transparent;
+}
+
+/* Card image/content */
+.card-img { width: 70px; height: 70px; object-fit: cover; border-radius: 12px; }
+.card-content { flex: 1; display: flex; flex-direction: column; text-align: left; }
+.card-title { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text); text-align: left; }
+.card-desc { margin: 4px 0 0; font-size: 0.9rem; opacity: 0.85; text-align: left; }
+
+/* Go To link */
+.card-link {
+  background: linear-gradient(135deg, var(--primary-from), var(--primary-to));
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 12px;
+  transition: filter 0.2s ease;
+  white-space: nowrap;
+}
+.card-link:hover { filter: brightness(1.1); }
+
+/* --- Animated purple ring --- */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 0 0 2px transparent;
+  opacity: 1;
+}
+
+@keyframes card-highlight {
+  0%, 20% {
+    box-shadow:
+      0 0 0 2px var(--hl-purple),
+      0 0 20px rgba(155, 92, 255, .28);
+  }
+  24%, 100% {
+    box-shadow:
+      0 0 0 2px transparent,
+      0 0 0 0 transparent;
+  }
+}
+
+/* Cycle: 5 cards over 25s (5s each) */
+.card:nth-child(1)::after { animation: card-highlight 25s infinite; }
+.card:nth-child(2)::after { animation: card-highlight 25s infinite 5s; }
+.card:nth-child(3)::after { animation: card-highlight 25s infinite 10s; }
+.card:nth-child(4)::after { animation: card-highlight 25s infinite 15s; }
+.card:nth-child(5)::after { animation: card-highlight 25s infinite 20s; }
+
+/* --- Single-stroke-on-hover fix --- */
+.center-stage:hover .card::after {
+  animation-play-state: paused;
+  opacity: 0;
+}
+.center-stage:hover .card:hover::after {
+  opacity: 1;
+  animation: none;
+  box-shadow:
+    0 0 0 2px var(--hl-purple),
+    0 0 24px rgba(155, 92, 255, .35);
+}
+
+/* --- Footer --- */
+.site-footer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--footer-h);
+  padding: 10px 24px calc(10px + env(safe-area-inset-bottom, 0px));
+  z-index: 11;
+  background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.footnav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.footnav a {
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.85;
+  font-weight: 600;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+.footnav a:hover { opacity: 1; transform: translateY(-1px); }
+.footnav a + a::before { content: "|"; opacity: 0.6; margin: 0 10px 0 2px; }
+
+/* --- Accent classes --- */
+.hl-purple { color: var(--hl-purple); font-weight: 800; }
+.hl-gpu    { color: var(--hl-gpu);    font-weight: 800; }

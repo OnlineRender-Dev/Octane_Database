@@ -1,0 +1,326 @@
+/* =========================================================
+   Education — Clean, fixed, one-screen CSS
+   - Header: brand/sponsor left, links right
+   - Intro ~200px under header, left-aligned
+   - Main fills the rest; GIF + two buttons centered
+   - No scrolling
+   ========================================================= */
+
+/* --- Settings --- */
+:root {
+  /* Colors */
+  --bg: hsl(220 18% 8%);
+  --surface: hsl(220 18% 12%);
+  --text: hsl(220 15% 92%);
+
+  /* Buttons */
+  --primary-from: hsl(210 100% 60%);
+  --primary-to:   hsl(280 100% 65%);
+  --radius: 16px;
+
+  /* Layout */
+  --page-pad: 24px;
+  --header-h: 96px;     /* approx header height */
+  --intro-offset: 100px;/* distance of blurb below header */
+  --gap: 90px;          /* space between GIF and buttons (raised a bit) */
+
+  /* Motion */
+  --btn-ease: cubic-bezier(.2,.8,.25,1);
+}
+
+/* --- Base / one-screen lock --- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  height: 100vh;            /* fallback */
+  height: 100svh;           /* dynamic viewport on mobile */
+  overflow: hidden;         /* NO SCROLLING */
+  background: radial-gradient(80% 60% at 50% 40%, var(--surface), var(--bg));
+  color: var(--text);
+  font: 500 18px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Make the 2nd topnav link ("Database") purple 
+.topnav a:nth-child(2) {
+  color: var(--primary-to);
+  opacity: 1;
+  font-weight: 700;
+}
+.topnav a:nth-child(2):hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+.topnav a:nth-child(2):visited {
+  color: var(--primary-to);
+}*/
+
+
+
+
+/* --- Header (fixed top) --- */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: 14px var(--page-pad);
+  min-height: var(--header-h);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0));
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;   /* brand left, links right */
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.brand-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  line-height: 1.1;
+}
+.brand {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  font-size: 1.25rem;
+}
+.sponsor {
+  color: var(--text);
+  opacity: 0.7;
+  font-size: 0.82rem;
+}
+.sponsor-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.sponsor-link:hover { opacity: 0.95; }
+
+/* Right-side links */
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.topnav a {
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 150ms ease, transform 150ms ease;
+  font-weight: 600;
+}
+.topnav a:hover { opacity: 1; transform: translateY(-1px); }
+/* separators: Link 1 | Link 2 */
+.topnav a + a::before {
+  content: "|";
+  opacity: 0.6;
+  margin: 0 10px 0 2px;
+}
+
+/* --- Intro line (doesn’t push layout) --- */
+.intro {
+  position: absolute;
+  top: calc(var(--header-h) + var(--intro-offset));
+  left: 0; right: 0;
+  z-index: 5;
+}
+.intro-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+}
+.intro-line {
+  margin: 0;
+  text-align: left;
+  font-weight: 700;
+  font-size: clamp(1rem, 0.9rem + 0.8vw, 1.25rem);
+  opacity: 0.92;
+}
+
+/* --- Main fills below header, centered --- */
+.center-stage {
+  position: absolute;
+  top: var(--header-h); left: 0; right: 0; bottom: 0;
+  display: grid;
+  place-content: center;
+  place-items: center;
+  gap: var(--gap);          /* raise/lower buttons here */
+  padding: var(--page-pad);
+  text-align: center;
+}
+
+/* GIF */
+.media { display: grid; place-items: center; }
+.hero-gif {
+  display: block;
+  width: min(260px, 70vw);
+  height: 200px;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 18px rgba(88,160,255,0.35))
+    drop-shadow(0 0 36px rgba(173,94,255,0.25));
+}
+
+/* Pull the GIF up without touching anything else */
+:root { --gif-nudge: -120px; }   /* try -40px to -100px to taste */
+.media { margin-top: var(--gif-nudge); }
+
+:root { --buttons-nudge: -90px; } /* try -20 to -60 */
+.actions { margin-top: var(--buttons-nudge); }
+
+
+/* Buttons */
+.actions {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.btn {
+  appearance: none;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 14px 24px;
+  font: inherit;
+  font-size: 1.1rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary-from), var(--primary-to));
+  background-size: 200% 200%;
+  animation: gradient-move 8s ease-in-out infinite; /* gentle drift */
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.08) inset,
+    0 8px 24px rgba(120, 80, 220, 0.25);
+  cursor: pointer;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+}
+/* Grow buttons on hover/focus */
+.btn {
+  transform-origin: center;
+  will-change: transform;
+  transition:
+    transform 180ms cubic-bezier(.2,.8,.25,1),
+    filter 140ms ease,
+    box-shadow 140ms ease;
+}
+
+/* bigger on hover/focus */
+.btn:hover,
+.btn:focus-visible {
+  transform: scale(1.08);          /* try 1.06–1.12 to taste */
+  filter: brightness(1.06);
+}
+
+/* quick press feedback */
+.btn:active {
+  transform: scale(0.98);
+  filter: brightness(0.98);
+}
+
+/* if they get too close when scaling, increase the gap a bit */
+.actions { gap: 36px; }  /* optional */
+
+.btn:active { transform: translateY(0); filter: brightness(0.98); }
+.btn:focus-visible { outline: 2px solid rgba(120,160,255,0.7); outline-offset: 3px; }
+
+/* Button entrance (Educator first, then Student) */
+#educatorBtn {
+  animation:
+    gradient-move 8s ease-in-out infinite 0s,
+    btn-in 700ms var(--btn-ease) 1 both 120ms;
+}
+#studentBtn {
+  animation:
+    gradient-move 8s ease-in-out infinite 0s,
+    btn-in 700ms var(--btn-ease) 1 both 320ms;
+}
+
+/* Keyframes */
+@keyframes gradient-move {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes btn-in {
+  0%   { opacity: 0; transform: translateY(14px) scale(0.92); }
+  60%  { opacity: 1; transform: translateY(-4px) scale(1.06); }
+  80%  {            transform: translateY(2px)  scale(0.98); }
+  100% {            transform: translateY(0)    scale(1); }
+}
+
+/* Fit smaller screens without scrolling */
+@media (max-height: 720px), (max-width: 520px) {
+  :root { --intro-offset: 140px; --gap: 70px; }
+  .hero-gif { width: min(220px, 65vw); }
+  .actions { gap: 20px; }
+  .topnav { gap: 6px; }
+  .topnav a + a::before { margin: 0 6px 0 0; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn { animation: none !important; }
+}
+/* --- Bottom bar (fixed) --- */
+:root { --footer-h: 56px; }
+
+.site-footer {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--footer-h);
+  padding: 10px 24px calc(10px + env(safe-area-inset-bottom, 0px));
+  z-index: 11;
+  background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* footer links */
+.footnav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.footnav a {
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0.85;
+  font-weight: 600;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+.footnav a:hover { opacity: 1; transform: translateY(-1px); }
+
+/* separators: Link 1 | Link 2 */
+.footnav a + a::before {
+  content: "|";
+  opacity: 0.6;
+  margin: 0 10px 0 2px;
+}
+
+/* make room so the footer doesn't overlap the centered content */
+.center-stage { bottom: var(--footer-h); position: absolute; }
+
+/* Accent colors for specific words */
+:root {
+  --hl-purple: #9b5cff;      /* tweak to your favorite purple hex */
+  --hl-gpu:    #9b5cff;      /* blue for "GPU" */
+  /* If you prefer to reuse your theme colors instead:
+     --hl-purple: var(--primary-to);
+     --hl-gpu:    var(--primary-from);
+  */
+}
+.hl-purple { color: var(--hl-purple); font-weight: 800; }
+.hl-gpu    { color: var(--hl-gpu);    font-weight: 800; }
